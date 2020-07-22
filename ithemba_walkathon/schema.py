@@ -1,10 +1,19 @@
 import graphene
+import graphql_jwt
 
-import walkathon.schema
+from walkathon.schema import Query as WalkathonQuery,\
+    Mutation as WalkathonMutation
+from ithemba_walkathon.users.schema import Mutation as UsersMutation, Query as UsersQuery
 
 
-class Query(walkathon.schema.Query, graphene.ObjectType):
+class Query(WalkathonQuery, UsersQuery, graphene.ObjectType):
     pass
 
 
-schema = graphene.Schema(query=Query)
+class Mutation(WalkathonMutation, UsersMutation, graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation)

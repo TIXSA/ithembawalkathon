@@ -102,6 +102,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -125,3 +130,5 @@ STATIC_URL = '/static/'
 GRAPHENE = {
     'SCHEMA': 'ithemba_walkathon.schema.schema',
 }
+
+'''python(path=“…/graphql-python/ithemba_walkathon/ithemba_walkathon/settings.py”) GRAPHENE = { ‘SCHEMA’: ‘ithemba_walkathon.schema.schema’, ‘MIDDLEWARE’: [ ‘graphql_jwt.middleware.JSONWebTokenMiddleware’, ], } '''
