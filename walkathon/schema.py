@@ -19,18 +19,28 @@ class RaceType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     # Add the search parameter inside our runners field
-    runners = graphene.List(RunnerType, search=graphene.String())
+    runners = graphene.List(
+        RunnerType,
+        search=graphene.String(),
+        first=graphene.Int(),
+        skip=graphene.Int()
+    )
     races = graphene.List(RaceType)
 
-    def resolve_runners(self, info, search=None, **kwargs):
-        # The value sent with the search parameter will be in the args variable
+    def resolve_runners(self, info, search=None, first=None, skip=None, **kwargs):
+        runners = Runner.objects.all()
         if search:
-            filter = (
+            filter_runner = (
                 Q(name__icontains=search) |
                 Q(email__icontains=search)
             )
-            return Runner.objects.filter(filter)
-        return Runner.objects.all()
+            runners = runners.filter(filter_runner)
+
+        if skip:
+            runners = runners[skip:]
+        if first:
+            runners = runners[:first]
+        return runners
 
     def resolve_races(self, info, **kwargs):
         return Race.objects.all()
