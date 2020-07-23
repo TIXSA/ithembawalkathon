@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
+from django.db.models import Q
 
 from .models import Runner, Race
 from ithemba_walkathon.users.schema import UserType
@@ -17,10 +18,18 @@ class RaceType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    runners = graphene.List(RunnerType)
+    # Add the search parameter inside our runners field
+    runners = graphene.List(RunnerType, search=graphene.String())
     races = graphene.List(RaceType)
 
-    def resolve_runners(self, info, **kwargs):
+    def resolve_runners(self, info, search=None, **kwargs):
+        # The value sent with the search parameter will be in the args variable
+        if search:
+            filter = (
+                Q(name__icontains=search) |
+                Q(email__icontains=search)
+            )
+            return Runner.objects.filter(filter)
         return Runner.objects.all()
 
     def resolve_races(self, info, **kwargs):
