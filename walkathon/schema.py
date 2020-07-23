@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 
 from .models import Runner
+from ithemba_walkathon.users.schema import UserType
 
 
 class RunnerType(DjangoObjectType):
@@ -22,6 +23,7 @@ class CreateRunner(graphene.Mutation):
     id = graphene.Int()
     name = graphene.String()
     email = graphene.String()
+    runner_profile = graphene.Field(UserType)
 
     # 2 data you can send to the server
     class Arguments:
@@ -31,14 +33,16 @@ class CreateRunner(graphene.Mutation):
 
     # 3 mutation method: it creates a Runner in the database using the data sent by the user
     def mutate(self, info, name, email, password):
-        runner = Runner(name=name, email=email, password=password)
+        runner_profile = info.context.user or None
+        runner = Runner(name=name, email=email, password=password, runner_profile=runner_profile)
         runner.save()
 
         # server returns the CreateRunner class with the data just created
         return CreateRunner(
             id=runner.id,
             name=runner.name,
-            email=runner.email
+            email=runner.email,
+            runner_profile=runner.runner_profile
         )
 
 
