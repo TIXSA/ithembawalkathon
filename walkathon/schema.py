@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 
-from .models import Runner
+from .models import Runner, Race
 from ithemba_walkathon.users.schema import UserType
 
 
@@ -46,6 +46,36 @@ class CreateRunner(graphene.Mutation):
         )
 
 
+class CreateRace(graphene.Mutation):
+    runner_profile = graphene.Field(UserType)
+    runner = graphene.Field(RunnerType)
+    distance = graphene.String()
+
+    class Arguments:
+        runner_id = graphene.Int()
+
+    def mutate(self, info, runner_id):
+        runner_profile = info.context.user
+        if runner_profile.is_anonymous:
+            raise Exception('you must be logged in to race')
+
+        runner = Runner.objects.filter(id=runner_id).first()
+        if not runner:
+            raise Exception('Invalid runner')
+
+        new_race = Race.objects.create(
+            runner_profile=runner_profile,
+            runner=runner
+        )
+
+        return CreateRace(
+            runner_profile=runner_profile,
+            runner=runner,
+            distance=new_race.distance
+        )
+
+
 # 4 Creates a mutation class with a field to be resolved, which points to our CreateRunner mutation
 class Mutation(graphene.ObjectType):
     create_runner = CreateRunner.Field()
+    create_race = CreateRace.Field()
