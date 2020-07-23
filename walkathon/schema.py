@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphql import GraphQLError
 
 from .models import Runner, Race
 from ithemba_walkathon.users.schema import UserType
@@ -66,7 +67,7 @@ class CreateRace(graphene.Mutation):
     def mutate(self, info, runner_id):
         runner_profile = info.context.user
         if runner_profile.is_anonymous:
-            raise Exception('you must be logged in to race')
+            raise GraphQLError('You must be logged to vote!')
 
         runner = Runner.objects.filter(id=runner_id).first()
         if not runner:
