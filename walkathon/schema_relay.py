@@ -32,3 +32,29 @@ class RelayQuery(graphene.ObjectType):
     relay_runner = graphene.relay.Node.Field(RunnerNode)
     #5
     relay_runners = DjangoFilterConnectionField(RunnerNode, filterset_class=RunnerFilter)
+
+
+class RelayCreateRunner(graphene.relay.ClientIDMutation):
+    runner = graphene.Field(RunnerNode)
+
+    class Input:
+        name = graphene.String()
+        email = graphene.String()
+        password = graphene.String()
+
+    def mutate_and_get_payload(root, info, **input):
+        user = info.context.user or None
+
+        runner = Runner(
+            name=input.get('name'),
+            email=input.get('email'),
+            password=input.get('password'),
+            runner_profile=user
+        )
+        runner.save()
+
+        return RelayCreateRunner(runner=runner)
+
+
+class RelayMutation(graphene.AbstractType):
+    relay_create_runner = RelayCreateRunner.Field()
