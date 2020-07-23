@@ -3,10 +3,11 @@ import graphql_jwt
 
 from walkathon.schema import Query as WalkathonQuery,\
     Mutation as WalkathonMutation
+from walkathon.schema_relay import RelayQuery
 from ithemba_walkathon.users.schema import Mutation as UsersMutation, Query as UsersQuery
 
 
-class Query(WalkathonQuery, UsersQuery, graphene.ObjectType):
+class Query(WalkathonQuery, UsersQuery, RelayQuery, graphene.ObjectType):
     pass
 
 
