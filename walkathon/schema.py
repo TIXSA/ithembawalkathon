@@ -10,11 +10,20 @@ class RunnerType(DjangoObjectType):
         model = Runner
 
 
+class RaceType(DjangoObjectType):
+    class Meta:
+        model = Race
+
+
 class Query(graphene.ObjectType):
     runners = graphene.List(RunnerType)
+    races = graphene.List(RaceType)
 
     def resolve_runners(self, info, **kwargs):
         return Runner.objects.all()
+
+    def resolve_races(self, info, **kwargs):
+        return Race.objects.all()
 
 
 # 1 mutation class

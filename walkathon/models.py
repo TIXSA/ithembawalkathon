@@ -14,6 +14,6 @@ class Runner(models.Model):
 
 class Race(models.Model):
     runner_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    runner = models.ForeignKey('Runner', related_name='race_runner', on_delete=models.CASCADE)
+    runner = models.ForeignKey('Runner', related_name='race', on_delete=models.CASCADE)
     distance = models.TextField(default='10km')
 
