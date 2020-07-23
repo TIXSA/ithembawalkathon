@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'graphql_jwt.middleware.JSONWebTokenMiddleware'
 ]
 
 ROOT_URLCONF = 'ithemba_walkathon.urls'
@@ -130,5 +131,3 @@ STATIC_URL = '/static/'
 GRAPHENE = {
     'SCHEMA': 'ithemba_walkathon.schema.schema',
 }
-
-'''python(path=“…/graphql-python/ithemba_walkathon/ithemba_walkathon/settings.py”) GRAPHENE = { ‘SCHEMA’: ‘ithemba_walkathon.schema.schema’, ‘MIDDLEWARE’: [ ‘graphql_jwt.middleware.JSONWebTokenMiddleware’, ], } '''
