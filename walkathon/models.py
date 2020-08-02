@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Walker(models.Model):
@@ -13,6 +14,7 @@ class Walker(models.Model):
     pace = models.CharField(max_length=255, null=True)
     device_type = models.CharField(max_length=20, null=True)
     new_notification = models.BooleanField(default=False)
+    steps_walked = models.CharField(max_length=255, null=True)
     time_started = models.TimeField(null=True)
     time_ended = models.TimeField(null=True)
     total_received_notifications = models.IntegerField(default=0)
@@ -26,7 +28,11 @@ class Walkathon(models.Model):
     name = models.CharField(max_length=255)
     year = models.CharField(max_length=255)
     starting_time = models.TimeField()
+    starting_day = models.DateField(default=timezone.now)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
 
 
 class SystemMessages(models.Model):
@@ -44,3 +50,4 @@ class UserMessages(models.Model):
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     time_sent = models.TimeField(null=True)
     message_type = models.CharField(max_length=255)
+    message_opened = models.BooleanField(default=False)

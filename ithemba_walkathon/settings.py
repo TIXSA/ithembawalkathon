@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'walkathon.apps.WalkathonConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
-    'walkathon',
 ]
 
 MIDDLEWARE = [
@@ -118,7 +118,7 @@ AUTHENTICATION_BACKENDS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Johannesburg'
 
 USE_I18N = True
 
