@@ -1,7 +1,7 @@
 import graphene
 from graphql import GraphQLError
 
-from ithemba_walkathon.users.schema import UserType
+from ithemba_walkathon.graphql_schema.types import UserType
 from ..models import Walker, Walkathon, UserMessages
 
 

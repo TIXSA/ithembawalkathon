@@ -3,7 +3,8 @@ import graphql_jwt
 
 from walkathon.graphql_schema.queries import Query as WalkathonQuery
 from walkathon.graphql_schema.mutations import Mutation as WalkathonMutation
-from ithemba_walkathon.users.schema import Mutation as UsersMutation, Query as UsersQuery
+from ithemba_walkathon.graphql_schema.mutations import Mutation as UsersMutation
+from ithemba_walkathon.graphql_schema.queries import Query as UsersQuery
 
 
 class Query(WalkathonQuery, UsersQuery, graphene.ObjectType):

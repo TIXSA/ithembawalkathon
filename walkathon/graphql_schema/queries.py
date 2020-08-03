@@ -1,5 +1,6 @@
 import graphene
 from django.db.models import Q
+from graphql import GraphQLError
 
 from ..models import Walker, Walkathon, UserMessages
 from .types import WalkerType, WalkathonType, UserMessagesType
@@ -13,7 +14,8 @@ class Query(graphene.ObjectType):
         first=graphene.Int(),
         skip=graphene.Int()
     )
-    walkathon = graphene.List(WalkathonType)
+    walker = graphene.Field(WalkerType)
+    walkathon = graphene.Field(WalkathonType, year=graphene.Int())
     user_messages = graphene.List(UserMessagesType)
 
     def resolve_walkers(self, info, search=None, first=None, skip=None, **kwargs):
@@ -31,8 +33,15 @@ class Query(graphene.ObjectType):
             walkers = walkers[:first]
         return walkers
 
-    def resolve_walkathons(self, info, **kwargs):
-        return Walkathon.objects.all()
+    def resolve_walkathon(self, info, year):
+        return Walkathon.objects.filter(year=year).first()
+
+    def resolve_walker(self, info):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get a walker profile!')
+        return Walker.objects.filter(user_profile=user_profile).first()
+
 
     def resolve_user_messages(self, info, **kwargs):
         return UserMessages.objects.all()
