@@ -19,6 +19,7 @@ class Walker(models.Model):
     time_ended = models.TimeField(null=True)
     total_received_notifications = models.IntegerField(default=0, null=True)
     total_opened_notifications = models.IntegerField(default=0, null=True)
+    milestones = models.TextField(null=True, default=[])
 
     def __str__(self):
         return self.walker_number
