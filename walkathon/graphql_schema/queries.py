@@ -42,6 +42,5 @@ class Query(graphene.ObjectType):
             raise GraphQLError('You must be logged to get a walker profile!')
         return Walker.objects.filter(user_profile=user_profile).first()
 
-
     def resolve_user_messages(self, info, **kwargs):
         return UserMessages.objects.all()

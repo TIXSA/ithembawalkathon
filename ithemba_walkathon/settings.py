@@ -84,8 +84,12 @@ WSGI_APPLICATION = 'ithemba_walkathon.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'avonJ001',
+        'USER': 'avonJ001',
+        'PASSWORD': 'M0t0r0la12345',
+        'HOST': 'sql26.jnb2.host-h.net',
+        'PORT': '3306'
     }
 }
 
