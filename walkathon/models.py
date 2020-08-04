@@ -1,24 +1,23 @@
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
 
 
 class Walker(models.Model):
     walker_number = models.CharField(max_length=255, default=0000)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    distance_to_walk = models.CharField(max_length=255, null=True)
+    distance_to_walk = models.CharField(max_length=255, null=True, default=8)
     fcm_token = models.TextField(null=True)
-    total_walked_distance = models.IntegerField(null=True)
-    walk_method = models.CharField(max_length=255, null=True)
+    total_walked_distance = models.IntegerField(null=True, default=0)
+    walk_method = models.CharField(max_length=255, null=True, default='Route')
     team = models.CharField(max_length=255, null=True)
     pace = models.CharField(max_length=255, null=True)
     device_type = models.CharField(max_length=20, null=True)
     new_notification = models.BooleanField(default=False)
-    steps_walked = models.CharField(max_length=255, null=True)
+    steps_walked = models.CharField(max_length=255, null=True, default=0)
     time_started = models.TimeField(null=True)
     time_ended = models.TimeField(null=True)
-    total_received_notifications = models.IntegerField(default=0, null=True)
-    total_opened_notifications = models.IntegerField(default=0, null=True)
+    total_received_notifications = models.IntegerField(null=True, default=0)
+    total_opened_notifications = models.IntegerField(null=True, default=0)
     milestones = models.TextField(null=True, default=[])
 
     def __str__(self):
@@ -29,7 +28,7 @@ class Walkathon(models.Model):
     name = models.CharField(max_length=255)
     year = models.IntegerField()
     starting_time = models.TimeField()
-    starting_day = models.DateField(default=timezone.now)
+    starting_day = models.DateField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
 
     def __str__(self):
