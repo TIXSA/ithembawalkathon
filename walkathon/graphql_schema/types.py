@@ -1,6 +1,6 @@
 from graphene_django import DjangoObjectType
 
-from ..models import Walker, Walkathon, UserMessages
+from ..models import Walker, Walkathon, UserMessages, Streaming
 
 
 class WalkerType(DjangoObjectType):
@@ -16,3 +16,8 @@ class WalkathonType(DjangoObjectType):
 class UserMessagesType(DjangoObjectType):
     class Meta:
         model = UserMessages
+
+
+class StreamingType(DjangoObjectType):
+    class Meta:
+        model = Streaming

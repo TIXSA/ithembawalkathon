@@ -51,3 +51,12 @@ class UserMessages(models.Model):
     time_sent = models.TimeField(null=True, blank=True)
     message_type = models.CharField(max_length=255)
     message_opened = models.BooleanField(default=False)
+
+
+class Streaming(models.Model):
+    stream_key = models.CharField(max_length=500)
+    year = models.IntegerField()
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
+    mux_token_id = models.CharField(max_length=255)
+    mux_token_secret = models.CharField(max_length=255)
+    playback_id = models.CharField(max_length=500)

@@ -2,8 +2,8 @@ import graphene
 from django.db.models import Q
 from graphql import GraphQLError
 
-from ..models import Walker, Walkathon, UserMessages
-from .types import WalkerType, WalkathonType, UserMessagesType
+from ..models import Walker, Walkathon, UserMessages, Streaming
+from .types import WalkerType, WalkathonType, UserMessagesType, StreamingType
 
 
 class Query(graphene.ObjectType):
@@ -17,6 +17,13 @@ class Query(graphene.ObjectType):
     walker = graphene.Field(WalkerType)
     walkathon = graphene.Field(WalkathonType, year=graphene.Int())
     user_messages = graphene.List(UserMessagesType)
+    stream = graphene.Field(StreamingType, year=graphene.Int())
+
+    def resolve_stream(self, info, year):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get a stream!')
+        return Streaming.objects.filter(year=year).first()
 
     def resolve_walkers(self, info, search=None, first=None, skip=None, **kwargs):
         walkers = Walker.objects.all()
