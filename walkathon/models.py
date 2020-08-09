@@ -60,3 +60,4 @@ class Streaming(models.Model):
     mux_token_id = models.CharField(max_length=255)
     mux_token_secret = models.CharField(max_length=255)
     playback_id = models.CharField(max_length=500)
+    stream_id = models.CharField(max_length=500)
