@@ -61,3 +61,4 @@ class Streaming(models.Model):
     mux_token_secret = models.CharField(max_length=255)
     playback_id = models.CharField(max_length=500)
     stream_id = models.CharField(max_length=500, default='HAF4Qtgury01lFYRYSMuj02AW4X2BNIDOiVbAwhgfy9kE')
+    stream_started = models.BooleanField(default=False)
