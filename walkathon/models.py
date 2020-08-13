@@ -19,6 +19,8 @@ class Walker(models.Model):
     total_received_notifications = models.IntegerField(null=True, default=0)
     total_opened_notifications = models.IntegerField(null=True, default=0)
     milestones = models.TextField(null=True, default=[])
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return self.walker_number
@@ -30,27 +32,34 @@ class Walkathon(models.Model):
     starting_time = models.TimeField()
     starting_day = models.DateField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
 class SystemMessages(models.Model):
+    message_type = models.CharField(max_length=255)  # blast or targeted
+    time_to_be_sent = models.TimeField(null=True, blank=True)
     title = models.CharField(max_length=255)
     message = models.TextField()
-    time_to_be_sent = models.TimeField(null=True, blank=True)
-    message_type = models.CharField(max_length=255)  # blast or targeted
+    image_url = models.TextField(null=True, blank=True)
     message_sent = models.BooleanField(default=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 
 class UserMessages(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()
+    image_url = models.TextField(null=True, blank=True)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    time_sent = models.TimeField(null=True, blank=True)
     message_type = models.CharField(max_length=255)
     message_opened = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 
 class Streaming(models.Model):
@@ -60,5 +69,5 @@ class Streaming(models.Model):
     mux_token_id = models.CharField(max_length=255)
     mux_token_secret = models.CharField(max_length=255)
     playback_id = models.CharField(max_length=500)
-    stream_id = models.CharField(max_length=500, default='HAF4Qtgury01lFYRYSMuj02AW4X2BNIDOiVbAwhgfy9kE')
+    stream_id = models.CharField(max_length=500, default='')
     stream_started = models.BooleanField(default=False)
