@@ -3,7 +3,7 @@ from graphql import GraphQLError
 
 from ithemba_walkathon.graphql_schema.types import UserType
 from ..models import Walker, Walkathon, UserMessages
-from .types import WalkerType
+from .types import WalkerType, UserMessagesType
 
 
 # 1 mutation class
@@ -61,6 +61,30 @@ class UpdateWalker(graphene.Mutation):
         return Walker.objects.filter(user_profile=user_profile).first()
 
 
+class UserMessageInput(graphene.InputObjectType):
+    id = graphene.String(required=True)
+    messageOpened = graphene.Boolean(required=True)
+
+
+# 1 mutation class
+class UpdateUserMessage(graphene.Mutation):
+    # output of the mutation
+    user_message = graphene.Field(UserMessagesType)
+
+    # 2 data you can send to the server
+    class Arguments:
+        user_message_input = UserMessageInput(required=True)
+
+    # 3 mutation method: it creates a Runner in the database using the data sent by the user
+    def mutate(self, info, user_message_input):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to create a walker profile!')
+        return UserMessages.objects.filter(
+            user_profile=user_profile,
+            pk=user_message_input.id).update(message_opened=user_message_input.messageOpened)
+
+
 class CreateWalkathon(graphene.Mutation):
     id = graphene.Int()
     name = graphene.String()
@@ -100,3 +124,4 @@ class Mutation(graphene.ObjectType):
     create_walker = CreateWalker.Field()
     create_walkathon = CreateWalkathon.Field()
     update_walker = UpdateWalker.Field()
+    update_user_message = UpdateUserMessage.Field()
