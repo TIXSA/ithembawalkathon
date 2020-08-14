@@ -89,7 +89,8 @@ DATABASES = {
         'USER': 'avonJ001',
         'PASSWORD': 'M0t0r0la12345',
         'HOST': 'sql26.jnb2.host-h.net',
-        'PORT': '3306'
+        'PORT': '3306',
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 

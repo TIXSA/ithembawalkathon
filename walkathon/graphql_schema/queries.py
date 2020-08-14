@@ -50,4 +50,8 @@ class Query(graphene.ObjectType):
         return Walker.objects.filter(user_profile=user_profile).first()
 
     def resolve_user_messages(self, info, **kwargs):
-        return UserMessages.objects.all()
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get a walker profile!')
+        return UserMessages.objects.filter(user_profile=user_profile)\
+            .only('title', 'message', 'image_url', 'message_opened')

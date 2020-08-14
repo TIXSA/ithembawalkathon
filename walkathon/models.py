@@ -1,6 +1,16 @@
 from django.db import models
 from django.conf import settings
 
+MESSAGE_TYPE_CHOICES = (
+        ('Individual', 'System Generated and Walker Activity Related'),
+        ('Blast', 'Marketing Team'),
+    )
+
+SEND_CONDITION_CHOICES = (
+        ('4km1', '4 km 1st Milestone'),
+        ('4km2', '4 km 2st Milestone'),
+    )
+
 
 class Walker(models.Model):
     walker_number = models.CharField(max_length=255, default=0000)
@@ -40,8 +50,9 @@ class Walkathon(models.Model):
 
 
 class SystemMessages(models.Model):
-    message_type = models.CharField(max_length=255)  # blast or targeted
-    time_to_be_sent = models.TimeField(null=True, blank=True)
+    message_type = models.CharField(max_length=255, choices=MESSAGE_TYPE_CHOICES)  # blast or targeted
+    send_condition = models.CharField(max_length=255, choices=SEND_CONDITION_CHOICES)  # blast or targeted
+    time_to_be_sent = models.DateTimeField(null=True, blank=True)
     title = models.CharField(max_length=255)
     message = models.TextField()
     image_url = models.TextField(null=True, blank=True)
@@ -54,9 +65,9 @@ class SystemMessages(models.Model):
 class UserMessages(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()
-    image_url = models.TextField(null=True, blank=True)
+    image_url = models.CharField(max_length=255, null=True, blank=True)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message_type = models.CharField(max_length=255)
+    message_type = models.CharField(max_length=255, default='Individual')
     message_opened = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
