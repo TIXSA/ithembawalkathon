@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Walkathon, Walker, Streaming, UserMessages
+from .models import Walkathon, Walker, Streaming, UserMessages, SystemMessages
 
 
 class WalkathonAdmin(admin.ModelAdmin):
@@ -20,8 +20,12 @@ class StreamingAdmin(admin.ModelAdmin):
     list_display = ('created_by', 'year')
 
 
+class SystemMessagesAdmin(admin.ModelAdmin):
+    list_display = ('message_type', 'send_condition', 'time_to_be_sent',  'title', 'message_sent')
+
+
 admin.site.register(Walkathon, WalkathonAdmin)
 admin.site.register(Walker, WalkerAdmin)
 admin.site.register(Streaming, StreamingAdmin)
 admin.site.register(UserMessages, UserMessagesAdmin)
-
+admin.site.register(SystemMessages, SystemMessagesAdmin)

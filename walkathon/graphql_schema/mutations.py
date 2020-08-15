@@ -1,5 +1,6 @@
 import graphene
 from graphql import GraphQLError
+from django.forms.models import model_to_dict
 
 from ithemba_walkathon.graphql_schema.types import UserType
 from ..models import Walker, Walkathon, UserMessages
@@ -33,56 +34,54 @@ class CreateWalker(graphene.Mutation):
         )
 
 
-# 1 mutation class
-class UpdateWalker(graphene.Mutation):
-    # output of the mutation
+class WalkerInput(graphene.InputObjectType):
+    walker_number = graphene.String()
+    fcm_token = graphene.String()
+    distance_to_walk = graphene.String()
+    total_walked_distance = graphene.Int()
+    walk_method = graphene.String()
+    device_type = graphene.String()
+    steps_walked = graphene.String()
+    time_started = graphene.String()
+    time_ended = graphene.String()
+    milestones = graphene.String()
+
+
+class CreateOrUpdateWalker(graphene.Mutation):
+    class Arguments:
+        walker_input = WalkerInput(required=True)
+
     walker = graphene.Field(WalkerType)
 
-    # 2 data you can send to the server
-    class Arguments:
-        field_name = graphene.String()
-        field_value = graphene.String()
-
-    # 3 mutation method: it creates a Runner in the database using the data sent by the user
-    def mutate(self, info, field_name, field_value):
+    def mutate(self, info, walker_input):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to create a walker profile!')
-        walker = Walker.objects.filter(user_profile=user_profile).first()
-        walker.distance_to_walk = 8
-        walker.save()
-        print('what came innnnkn\n')
-        print(field_name)
-        print(field_value)
-        print(walker)
-        print('=======================\n')
-
-        # server returns the CreateRunner class with the data just created
-        return Walker.objects.filter(user_profile=user_profile).first()
+        walker, created = Walker.objects.update_or_create(user_profile=user_profile, defaults={**walker_input})
+        return CreateOrUpdateWalker(walker)
 
 
 class UserMessageInput(graphene.InputObjectType):
     id = graphene.String(required=True)
-    messageOpened = graphene.Boolean(required=True)
+    message_opened = graphene.Boolean(required=True)
 
 
-# 1 mutation class
 class UpdateUserMessage(graphene.Mutation):
-    # output of the mutation
     user_message = graphene.Field(UserMessagesType)
 
-    # 2 data you can send to the server
     class Arguments:
         user_message_input = UserMessageInput(required=True)
 
-    # 3 mutation method: it creates a Runner in the database using the data sent by the user
     def mutate(self, info, user_message_input):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to create a walker profile!')
-        return UserMessages.objects.filter(
+        UserMessages.objects.filter(
             user_profile=user_profile,
-            pk=user_message_input.id).update(message_opened=user_message_input.messageOpened)
+            pk=user_message_input.id).update(**user_message_input)
+        user_message = UserMessages.objects.filter(user_profile=user_profile, pk=user_message_input.id).first()
+
+        return UpdateUserMessage(user_message)
 
 
 class CreateWalkathon(graphene.Mutation):
@@ -119,9 +118,8 @@ class CreateWalkathon(graphene.Mutation):
         )
 
 
-# 4 Creates a mutation class with a field to be resolved, which points to our CreateRunner mutation
 class Mutation(graphene.ObjectType):
     create_walker = CreateWalker.Field()
     create_walkathon = CreateWalkathon.Field()
-    update_walker = UpdateWalker.Field()
+    create_or_update_walker = CreateOrUpdateWalker.Field()
     update_user_message = UpdateUserMessage.Field()
