@@ -30,7 +30,7 @@ class UpdateOrCreateStream(graphene.Mutation):
 
         Streaming.objects.update_or_create(
             stream_id=stream_input.stream_id, created_by=user_profile, defaults={**stream_input})
-        stream = Streaming.objects.filter(
+        stream, created = Streaming.objects.filter(
             created_by=user_profile, stream_id=stream_input.stream_id).first()
         handle_stream_update_or_create(stream)
         return UpdateOrCreateStream(stream)

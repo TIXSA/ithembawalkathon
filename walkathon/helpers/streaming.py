@@ -3,8 +3,6 @@ from ..clients.firebase import send_message
 
 
 def handle_stream_update_or_create(stream):
-    print('hiiiii')
-    print(model_to_dict(stream))
     message = {
         'notification': {
             'title': 'Hi Man',

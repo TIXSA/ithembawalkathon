@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 
+from walkathon.helpers.system_messages import handle_system_message_update
+
 MESSAGE_TYPE_CHOICES = (
         ('Individual', 'System Generated and Walker Activity Related'),
         ('Blast', 'Marketing Team'),
@@ -17,6 +19,7 @@ SEND_CONDITION_CHOICES = (
         ('8km4', '8 km 4th Milestone'),
         ('NOW', 'SEND NOW - WARNING will send immediately after you press save'),
         ('SCHEDULED', 'Scheduled - Date and Time need to be specified'),
+        ('NEW_STREAM_STARTED', 'Stream started'),
     )
 
 
@@ -66,6 +69,10 @@ class SystemMessages(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        handle_system_message_update(self)
+        super(SystemMessages, self).save(*args, **kwargs)
+
 
 class Streaming(models.Model):
     stream_key = models.CharField(max_length=500)
@@ -77,3 +84,4 @@ class Streaming(models.Model):
     stream_id = models.CharField(max_length=500, default='')
     stream_started = models.BooleanField(default=False)
     stream_ended = models.BooleanField(default=False)
+    stream_name = models.CharField(max_length=500, default='')
