@@ -67,7 +67,6 @@ class SystemMessages(models.Model):
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 
-
 class Streaming(models.Model):
     stream_key = models.CharField(max_length=500)
     year = models.IntegerField()
@@ -77,3 +76,4 @@ class Streaming(models.Model):
     playback_id = models.CharField(max_length=500)
     stream_id = models.CharField(max_length=500, default='')
     stream_started = models.BooleanField(default=False)
+    stream_ended = models.BooleanField(default=False)

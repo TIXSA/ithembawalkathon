@@ -12,7 +12,7 @@ class WalkerAdmin(admin.ModelAdmin):
 
 
 class StreamingAdmin(admin.ModelAdmin):
-    list_display = ('created_by', 'year')
+    list_display = ('created_by', 'year', 'stream_id')
 
 
 class SystemMessagesAdmin(admin.ModelAdmin):

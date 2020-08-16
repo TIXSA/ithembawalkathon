@@ -1,8 +1,37 @@
 import graphene
 from graphql import GraphQLError
 
-from ..models import Walker
+from ..models import Walker, Streaming
 from .types import WalkerType, StreamingType
+
+
+class StreamInput(graphene.InputObjectType):
+    stream_key = graphene.String()
+    year = graphene.Int()
+    mux_token_id = graphene.String()
+    mux_token_secret = graphene.String()
+    playback_id = graphene.String()
+    stream_id = graphene.String()
+    stream_started = graphene.Boolean()
+    stream_ended = graphene.Boolean()
+
+
+class UpdateOrCreateStream(graphene.Mutation):
+    class Arguments:
+        stream_input = StreamInput(required=True)
+
+    stream = graphene.Field(StreamingType)
+
+    def mutate(self, info, stream_input):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to create a walker profile!')
+
+        Streaming.objects.update_or_create(
+            stream_id=stream_input.stream_id, created_by=user_profile, defaults={**stream_input})
+        stream = Streaming.objects.filter(
+            created_by=user_profile, stream_id=stream_input.stream_id).first()
+        return UpdateOrCreateStream(stream)
 
 
 class WalkerInput(graphene.InputObjectType):
@@ -35,3 +64,4 @@ class UpdateWalker(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     update_walker = UpdateWalker.Field()
+    update_or_create_stream = UpdateOrCreateStream.Field()
