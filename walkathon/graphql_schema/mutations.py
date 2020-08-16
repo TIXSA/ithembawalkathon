@@ -1,6 +1,7 @@
 import graphene
 from graphql import GraphQLError
 
+from ..helpers.streaming import handle_stream_update_or_create
 from ..models import Walker, Streaming
 from .types import WalkerType, StreamingType
 
@@ -31,6 +32,7 @@ class UpdateOrCreateStream(graphene.Mutation):
             stream_id=stream_input.stream_id, created_by=user_profile, defaults={**stream_input})
         stream = Streaming.objects.filter(
             created_by=user_profile, stream_id=stream_input.stream_id).first()
+        handle_stream_update_or_create(stream)
         return UpdateOrCreateStream(stream)
 
 
