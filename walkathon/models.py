@@ -9,6 +9,14 @@ MESSAGE_TYPE_CHOICES = (
 SEND_CONDITION_CHOICES = (
         ('4km1', '4 km 1st Milestone'),
         ('4km2', '4 km 2nd Milestone'),
+        ('4km3', '4 km 3rd Milestone'),
+        ('4km4', '4 km 4th Milestone'),
+        ('8km1', '8 km 1st Milestone'),
+        ('8km2', '8 km 2nd Milestone'),
+        ('8km3', '8 km 3rd Milestone'),
+        ('8km4', '8 km 4th Milestone'),
+        ('NOW', 'SEND NOW - WARNING will send immediately after you press save'),
+        ('SCHEDULED', 'Scheduled - Date and Time need to be specified'),
     )
 
 
@@ -27,6 +35,7 @@ class Walker(models.Model):
     milestones = models.TextField(null=True, default=[])
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+    messages_read = models.TextField(null=True, default=[])
 
     def __str__(self):
         return self.walker_number
@@ -46,27 +55,17 @@ class Walkathon(models.Model):
 
 
 class SystemMessages(models.Model):
-    message_type = models.CharField(max_length=255, default=('Blast', 'Marketing Team'),choices=MESSAGE_TYPE_CHOICES)
     send_condition = models.CharField(max_length=255, default=('4km1', '4 km 1st Milestone'), choices=SEND_CONDITION_CHOICES)
     time_to_be_sent = models.DateTimeField(null=True, blank=True)
     title = models.CharField(max_length=255)
     message = models.TextField()
-    image_url = models.TextField(null=True, blank=True)
+    image_url = models.CharField(null=True, blank=True, max_length=500)
     message_sent = models.BooleanField(default=False)
+    message_opened = models.BooleanField(default=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
-
-class UserMessages(models.Model):
-    title = models.CharField(max_length=255)
-    message = models.TextField()
-    image_url = models.CharField(max_length=255, null=True, blank=True)
-    user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message_type = models.CharField(max_length=255, default='Individual')
-    message_opened = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 
 class Streaming(models.Model):

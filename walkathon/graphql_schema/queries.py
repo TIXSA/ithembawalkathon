@@ -1,22 +1,15 @@
 import graphene
-from django.db.models import Q
 from graphql import GraphQLError
+import json
 
-from ..models import Walker, Walkathon, UserMessages, Streaming
-from .types import WalkerType, WalkathonType, UserMessagesType, StreamingType
+from ..models import Walker, Walkathon, Streaming, SystemMessages
+from .types import WalkerType, WalkathonType, StreamingType, MessagesType
 
 
 class Query(graphene.ObjectType):
-    # Add the search parameter inside our runners field
-    walkers = graphene.List(
-        WalkerType,
-        search=graphene.String(),
-        first=graphene.Int(),
-        skip=graphene.Int()
-    )
     walker = graphene.Field(WalkerType)
     walkathon = graphene.Field(WalkathonType, year=graphene.Int())
-    user_messages = graphene.List(UserMessagesType)
+    messages = graphene.List(MessagesType)
     stream = graphene.Field(StreamingType, year=graphene.Int())
 
     def resolve_stream(self, info, year):
@@ -24,21 +17,6 @@ class Query(graphene.ObjectType):
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to get a stream!')
         return Streaming.objects.filter(year=year).first()
-
-    def resolve_walkers(self, info, search=None, first=None, skip=None, **kwargs):
-        walkers = Walker.objects.all()
-        if search:
-            filter_walker = (
-                Q(name__icontains=search) |
-                Q(email__icontains=search)
-            )
-            walkers = walkers.filter(filter_walker)
-
-        if skip:
-            walkers = walkers[skip:]
-        if first:
-            walkers = walkers[:first]
-        return walkers
 
     def resolve_walkathon(self, info, year):
         return Walkathon.objects.filter(year=year).first()
@@ -49,9 +27,9 @@ class Query(graphene.ObjectType):
             raise GraphQLError('You must be logged to get a walker profile!')
         return Walker.objects.filter(user_profile=user_profile).first()
 
-    def resolve_user_messages(self, info, **kwargs):
+    def resolve_messages(self, info):
         user_profile = info.context.user
         if user_profile.is_anonymous:
-            raise GraphQLError('You must be logged to get a walker profile!')
-        return UserMessages.objects.filter(user_profile=user_profile)\
-            .only('title', 'message', 'image_url', 'message_opened')
+            raise GraphQLError('You must be logged to get messages!')
+        return SystemMessages.objects.filter(message_sent=True)\
+            .only('title', 'message', 'image_url')
