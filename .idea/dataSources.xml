@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="sqlite" uuid="b5785a31-9bff-44e6-a08a-948e3403e7ef">
-      <driver-ref>sqlite.xerial</driver-ref>
+    <data-source source="LOCAL" name="Ithemba Walkathon" uuid="6f0958c3-c644-4a84-bc9a-774457da216e">
+      <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db.sqlite3</jdbc-url>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://sql26.jnb2.host-h.net:3306/avonJ001</jdbc-url>
     </data-source>
   </component>
 </project>

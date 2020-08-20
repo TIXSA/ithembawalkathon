@@ -31,5 +31,5 @@ class Query(graphene.ObjectType):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to get messages!')
-        return SystemMessages.objects.filter(message_sent=True)\
+        return SystemMessages.objects.filter(message_sent=True).order_by('updated')\
             .only('title', 'message', 'image_url')
