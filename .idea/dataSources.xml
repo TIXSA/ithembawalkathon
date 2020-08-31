@@ -5,7 +5,13 @@
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://sql26.jnb2.host-h.net:3306/avonJ001</jdbc-url>
+      <jdbc-url>jdbc:mysql://dedi860.jnb3.host-h.net:3306/SKU_Avon</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Old Ithemba Walkathon" uuid="3e71afd9-3ba9-4a18-a891-9dcc80ff0994">
+      <driver-ref>mariadb</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mariadb://sql26.jnb2.host-h.net:3306/avonJ001</jdbc-url>
     </data-source>
   </component>
 </project>

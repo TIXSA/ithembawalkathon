@@ -85,10 +85,10 @@ WSGI_APPLICATION = 'ithemba_walkathon.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'avonJ001',
-        'USER': 'avonJ001',
+        'NAME': 'SKU_Avon',
+        'USER': 'SKU_Avon',
         'PASSWORD': 'M0t0r0la12345',
-        'HOST': 'sql26.jnb2.host-h.net',
+        'HOST': 'dedi860.jnb3.host-h.net',
         'PORT': '3306',
         'OPTIONS': {'charset': 'utf8mb4'},
     }
