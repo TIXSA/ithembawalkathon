@@ -10,13 +10,13 @@ class Query(graphene.ObjectType):
     walker = graphene.Field(WalkerType)
     walkathon = graphene.Field(WalkathonType, year=graphene.Int())
     messages = graphene.List(MessagesType)
-    stream = graphene.Field(StreamingType, year=graphene.Int())
+    streams = graphene.List(StreamingType)
 
-    def resolve_stream(self, info, year):
+    def resolve_streams(self, info):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to get a stream!')
-        return Streaming.objects.filter(year=year).first()
+        return Streaming.objects.all().order_by('-pk')
 
     def resolve_walkathon(self, info, year):
         return Walkathon.objects.filter(year=year).first()
