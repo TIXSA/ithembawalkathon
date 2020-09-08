@@ -47,6 +47,7 @@ class WalkerInput(graphene.InputObjectType):
     time_ended = graphene.String()
     milestones = graphene.String()
     messages_read = graphene.String()
+    messages_received = graphene.String()
 
 
 class UpdateWalker(graphene.Mutation):

@@ -10,12 +10,12 @@ def handle_system_message_update(system_message):
             'image': system_message.image_url,
         },
         'data': {
-            'message_id': str(system_message.pk),
+            'message_pk': str(system_message.pk),
             'title': str(system_message.title),
             'body': str(system_message.message),
             'image': str(system_message.image_url),
         },
-        'topic': 'walkathon_global'
+        'topic': 'dev_walkathon_global'
     }
 
     send_message(message)

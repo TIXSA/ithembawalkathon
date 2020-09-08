@@ -31,5 +31,6 @@ class Query(graphene.ObjectType):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to get messages!')
-        return SystemMessages.objects.filter(message_sent=True).order_by('updated')\
+        walker = Walker.objects.filter(user_profile=user_profile).first()
+        return SystemMessages.objects.filter(pk__in=json.loads(walker.messages_received)).order_by('updated')\
             .only('title', 'message', 'image_url')

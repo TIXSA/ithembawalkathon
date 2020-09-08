@@ -135,6 +135,7 @@ class Walker(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
     messages_read = models.TextField(null=True, default=[])
+    messages_received = models.TextField(null=True, default=[])
 
     def __str__(self):
         return self.walker_number
