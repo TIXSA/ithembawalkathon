@@ -1,9 +1,31 @@
 import graphene
 from graphql import GraphQLError
+from django.contrib.auth import get_user_model
+
 
 from ..helpers.streaming import handle_stream_update_or_create
 from ..models import Walker, Streaming
-from .types import WalkerType, StreamingType
+from .types import WalkerType, StreamingType, UserType
+
+
+class CreateUser(graphene.Mutation):
+    user = graphene.Field(UserType)
+
+    class Arguments:
+        username = graphene.String(required=True)
+        password = graphene.String(required=True)
+
+    def mutate(self, info, username, password):
+        if not username or not password:
+            raise GraphQLError('Enter valid username and password')
+        user = get_user_model()(
+            username=username,
+            password=password,
+        )
+        user.set_password(password)
+        user.save()
+
+        return CreateUser(user=user)
 
 
 class StreamInput(graphene.InputObjectType):
@@ -68,3 +90,4 @@ class UpdateWalker(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     update_walker = UpdateWalker.Field()
     update_or_create_stream = UpdateOrCreateStream.Field()
+    create_user = CreateUser.Field()
