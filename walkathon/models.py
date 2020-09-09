@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from walkathon.helpers.system_messages import handle_system_message_update
+from walkathon.helpers.common import handle_model_update
 
 MESSAGE_TYPE_CHOICES = (
     ('Individual', 'System Generated and Walker Activity Related'),
@@ -150,6 +151,10 @@ class Walkathon(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        handle_model_update('walkathon')
+        super(Walkathon, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -183,3 +188,7 @@ class Streaming(models.Model):
     stream_started = models.BooleanField(default=False)
     stream_ended = models.BooleanField(default=False)
     stream_name = models.CharField(max_length=500, default='')
+
+    def save(self, *args, **kwargs):
+        handle_model_update('streams')
+        super(Streaming, self).save(*args, **kwargs)
