@@ -1,4 +1,3 @@
-from django.forms import model_to_dict
 from ..clients.firebase import send_message
 
 

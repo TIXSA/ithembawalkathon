@@ -1,9 +1,9 @@
 import graphene
 from graphql import GraphQLError
-from django.contrib.auth import get_user_model
 
 
 from ..helpers.streaming import handle_stream_update_or_create
+from ..helpers.walker import create_new_user
 from ..models import Walker, Streaming
 from .types import WalkerType, StreamingType, UserType
 
@@ -18,13 +18,8 @@ class CreateUser(graphene.Mutation):
     def mutate(self, info, username, password):
         if not username or not password:
             raise GraphQLError('Enter valid username and password')
-        user = get_user_model()(
-            username=username,
-            password=password,
-        )
-        user.set_password(password)
-        user.save()
 
+        user = create_new_user(username, password)
         return CreateUser(user=user)
 
 
