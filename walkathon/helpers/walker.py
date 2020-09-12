@@ -48,7 +48,7 @@ class WalkerHelper:
                 else:
                     self.add_member_walker_profile(member)
         else:
-            Users.objects.filter(username=self.username).delete()
+            User.objects.filter(username=self.username).delete()
             raise GraphQLError(errors['9'])
 
     def add_member_walker_profile(self, member):
