@@ -26,6 +26,7 @@ SEND_CONDITION_CHOICES = (
 
 class Users(models.Model):
     uid = models.AutoField(primary_key=True)
+    long_uid = models.IntegerField()
     username = models.CharField(max_length=50, blank=True, null=True)
     password = models.CharField(max_length=60, blank=True, null=True)
     chooser = models.CharField(max_length=50, blank=True, null=True)
@@ -121,6 +122,7 @@ class Teams(models.Model):
 
 
 class Walker(models.Model):
+    uid = models.IntegerField(default=0)
     walker_number = models.CharField(max_length=255, default=0000)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     distance_to_walk = models.CharField(max_length=255, null=True, default=8)

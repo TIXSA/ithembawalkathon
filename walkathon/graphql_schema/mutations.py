@@ -3,7 +3,7 @@ from graphql import GraphQLError
 
 
 from ..helpers.streaming import handle_stream_update_or_create
-from ..helpers.walker import create_new_user
+from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
 from .types import WalkerType, StreamingType, UserType
 
@@ -19,7 +19,7 @@ class CreateUser(graphene.Mutation):
         if not username or not password:
             raise GraphQLError('Enter valid username and password')
 
-        user = create_new_user(username, password)
+        user = WalkerHelper(username, password).create_new_walker()
         return CreateUser(user=user)
 
 
