@@ -11,6 +11,9 @@ errors = {
     '4': 'The amount paid manually is not equal to the total owed amount for all registered member(s)',
     '5': 'If you have completed your registration, please make sure you have made a manual or '
          'PayFast payment.',
+    '6': 'Invalid login credentials',
+    '7': 'Invalid username',
+    '8': 'Password and username do not match',
 }
 
 
@@ -63,11 +66,15 @@ class WalkerHelper:
         user.save()
 
     def check_if_user_in_users_table(self):
+        django_user = get_user_model()(username=self.username)
+        if django_user:
+            raise GraphQLError(errors['6'])
+
         user = Users.objects.filter(username=self.username).first()
         if user:
             self.php_user = user
         else:
-            raise GraphQLError('Invalid username')
+            raise GraphQLError(errors['7'])
 
     def check_if_input_password_same_as_user_password(self):
         if self.php_user.password.find('$2y$10$') == 0:
@@ -76,7 +83,7 @@ class WalkerHelper:
             passwords_match = self.password == self.php_user.password
 
         if not passwords_match:
-            raise GraphQLError('Password and username do not match')
+            raise GraphQLError(errors['8'])
 
         if self.php_user.long_uid > 0:
             self.php_user_uid = self.php_user.long_uid
