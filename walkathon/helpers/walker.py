@@ -36,8 +36,7 @@ class WalkerHelper:
         self.check_if_input_password_same_as_user_password()
         self.check_if_entrant_paid()
         self.get_team_members()
-
-        raise GraphQLError(errors['0'])
+        return self.django_user
 
     def get_team_members(self):
         team = Teams.objects.filter(uid=self.php_user_uid).order_by('wid')
