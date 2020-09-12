@@ -139,6 +139,9 @@ class Walker(models.Model):
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
     messages_read = models.TextField(null=True, default=[])
     messages_received = models.TextField(null=True, default=[])
+    walker_leader = models.BooleanField(default=False)
+    generated_username = models.CharField(max_length=255, null=True, blank=True)
+    generated_password = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.walker_number

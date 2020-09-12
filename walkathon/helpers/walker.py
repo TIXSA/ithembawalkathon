@@ -1,5 +1,6 @@
 import bcrypt
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from walkathon.models import Users, Entrant
 from graphql import GraphQLError
 
@@ -24,13 +25,20 @@ class WalkerHelper:
         self.php_user = None
         self.django_user = None
         self.php_user_uid = 0
+        self.entrant = None
 
     def create_new_walker(self):
         self.check_if_user_in_users_table()
         self.check_if_input_password_same_as_user_password()
         self.check_if_entrant_paid()
+        self.add_leader_walker_profile()
 
         raise GraphQLError(errors['0'])
+
+    def add_leader_walker_profile(self):
+        self.django_user.first_name = self.entrant.firstname
+        self.django_user.last_name = self.entrant.lastname
+        self.django_user.save()
 
     def check_if_entrant_paid(self):
         entrant = Entrant.objects.filter(uid=self.php_user_uid).first()
@@ -40,17 +48,20 @@ class WalkerHelper:
         elif entrant.payfast_paid == 'Yes' and entrant.manual_paid == 'Yes':
             if entrant.total_amount == entrant.manual_paid_amount + entrant.payfast_paid_amount:
                 self.new_auth_user()
+                self.entrant = entrant
             else:
                 raise GraphQLError(errors['2'])
 
         elif entrant.payfast_paid == 'Yes' and not entrant.manual_paid:
             if entrant.total_amount == entrant.payfast_paid_amount:
                 self.new_auth_user()
+                self.entrant = entrant
             else:
                 raise GraphQLError(errors['3'])
         elif entrant.manual_paid == 'Yes' and not entrant.payfast_paid:
             if entrant.total_amount == entrant.manual_paid_amount:
                 self.new_auth_user()
+                self.entrant = entrant
             else:
                 raise GraphQLError(errors['4'])
         else:
@@ -66,7 +77,7 @@ class WalkerHelper:
         user.save()
 
     def check_if_user_in_users_table(self):
-        django_user = get_user_model()(username=self.username)
+        django_user = User.objects.filter(username=self.username).first()
         if django_user:
             raise GraphQLError(errors['6'])
 
