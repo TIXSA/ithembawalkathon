@@ -12,6 +12,7 @@ class Query(graphene.ObjectType):
     messages = graphene.List(MessagesType)
     streams = graphene.List(StreamingType)
     me = graphene.Field(UserType)
+    walkers = graphene.List(WalkerType)
 
     def resolve_me(self, info):
         user = info.context.user
@@ -42,3 +43,11 @@ class Query(graphene.ObjectType):
         walker = Walker.objects.filter(user_profile=user_profile).first()
         return SystemMessages.objects.filter(pk__in=json.loads(walker.messages_received)).order_by('updated')\
             .only('title', 'message', 'image_url')
+
+    def resolve_walkers(self, info):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get walkers!')
+        walker_leader = Walker.objects.filter(user_profile=user_profile).first()
+        walkers = Walker.objects.filter(uid=walker_leader.uid).exclude(user_profile=user_profile).all()
+        return walkers

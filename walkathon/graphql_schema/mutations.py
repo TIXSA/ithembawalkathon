@@ -73,8 +73,6 @@ class UpdateWalker(graphene.Mutation):
     walker = graphene.Field(WalkerType)
 
     def mutate(self, info, walker_input):
-        print(walker_input)
-
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to create a walker profile!')
@@ -82,7 +80,6 @@ class UpdateWalker(graphene.Mutation):
             walker_input['time_ended'] = iso_string_to_datetime(walker_input.time_ended)
         if walker_input.time_started:
             walker_input['time_started'] = iso_string_to_datetime(walker_input.time_started)
-        print(walker_input)
 
         Walker.objects.filter(user_profile=user_profile).update(**walker_input)
         walker = Walker.objects.filter(user_profile=user_profile).first()
