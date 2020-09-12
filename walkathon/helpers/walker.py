@@ -1,7 +1,7 @@
 import bcrypt
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from walkathon.models import Users, Entrant
+from walkathon.models import Users, Entrant, Walker
 from graphql import GraphQLError
 
 errors = {
@@ -39,6 +39,16 @@ class WalkerHelper:
         self.django_user.first_name = self.entrant.firstname
         self.django_user.last_name = self.entrant.lastname
         self.django_user.save()
+        Walker.objects.update_or_create(
+            user_profile=self.django_user,
+            defaults={
+                'uid': self.php_user_uid,
+                'walker_number': 4,
+                'distance_to_walk': 8 if self.entrant.walk_distance == '8km' else 4,
+                'team': self.entrant.team_name,
+                'walker_leader': True,
+            }
+        )
 
     def check_if_entrant_paid(self):
         entrant = Entrant.objects.filter(uid=self.php_user_uid).first()
@@ -52,13 +62,13 @@ class WalkerHelper:
             else:
                 raise GraphQLError(errors['2'])
 
-        elif entrant.payfast_paid == 'Yes' and not entrant.manual_paid:
+        elif entrant.payfast_paid == 'Yes':
             if entrant.total_amount == entrant.payfast_paid_amount:
                 self.new_auth_user()
                 self.entrant = entrant
             else:
                 raise GraphQLError(errors['3'])
-        elif entrant.manual_paid == 'Yes' and not entrant.payfast_paid:
+        elif entrant.manual_paid == 'Yes':
             if entrant.total_amount == entrant.manual_paid_amount:
                 self.new_auth_user()
                 self.entrant = entrant
