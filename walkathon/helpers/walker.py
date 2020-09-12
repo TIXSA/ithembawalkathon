@@ -1,7 +1,9 @@
 import bcrypt
+import random
+import string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from walkathon.models import Users, Entrant, Walker
+from walkathon.models import Users, Entrant, Walker, Teams
 from graphql import GraphQLError
 
 errors = {
@@ -15,6 +17,7 @@ errors = {
     '6': 'Invalid login credentials',
     '7': 'Invalid username',
     '8': 'Password and username do not match',
+    '9': 'Profile was not completed correctly. Please email support at avonjustinewalk@s4u.co.za',
 }
 
 
@@ -26,16 +29,52 @@ class WalkerHelper:
         self.django_user = None
         self.php_user_uid = 0
         self.entrant = None
+        self.team = None
 
     def create_new_walker(self):
         self.check_if_user_in_users_table()
         self.check_if_input_password_same_as_user_password()
         self.check_if_entrant_paid()
-        self.add_leader_walker_profile()
+        self.get_team_members()
 
         raise GraphQLError(errors['0'])
 
-    def add_leader_walker_profile(self):
+    def get_team_members(self):
+        team = Teams.objects.filter(uid=self.php_user_uid).order_by('wid')
+        if team:
+            for index, member in enumerate(team):
+                if index == 0:
+                    self.add_leader_walker_profile(member.wid)
+                else:
+                    self.add_member_walker_profile(member)
+        else:
+            Users.objects.filter(username=self.username).delete()
+            raise GraphQLError(errors['9'])
+
+    def add_member_walker_profile(self, member):
+        generated_username = '{}_{}_{}'.format(member.wid, member.firstname, member.lastname)
+        generated_password = get_random_alphanumeric_string(10)
+        member_django_user = get_user_model()(
+            username=generated_username,
+            password=generated_password,
+            first_name=member.firstname,
+            last_name=member.lastname,
+        )
+        member_django_user.set_password(generated_password)
+        member_django_user.save()
+        Walker.objects.update_or_create(
+            user_profile=member_django_user,
+            defaults={
+                'uid': self.php_user_uid,
+                'walker_number': member.wid,
+                'distance_to_walk': 8,
+                'team': member.team_name,
+                'generated_username': generated_username,
+                'generated_password': generated_password,
+            }
+        )
+
+    def add_leader_walker_profile(self, walker_number):
         self.django_user.first_name = self.entrant.firstname
         self.django_user.last_name = self.entrant.lastname
         self.django_user.save()
@@ -43,7 +82,7 @@ class WalkerHelper:
             user_profile=self.django_user,
             defaults={
                 'uid': self.php_user_uid,
-                'walker_number': 4,
+                'walker_number': walker_number,
                 'distance_to_walk': 8 if self.entrant.walk_distance == '8km' else 4,
                 'team': self.entrant.team_name,
                 'walker_leader': True,
@@ -110,3 +149,8 @@ class WalkerHelper:
             self.php_user_uid = self.php_user.long_uid
         else:
             self.php_user_uid = self.php_user.uid
+
+
+def get_random_alphanumeric_string(length):
+    letters_and_digits = string.ascii_letters + string.digits
+    return ''.join((random.choice(letters_and_digits) for i in range(length)))
