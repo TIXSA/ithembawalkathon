@@ -3,7 +3,7 @@ from graphql import GraphQLError
 import json
 
 from ..models import Walker, Walkathon, Streaming, SystemMessages
-from .types import WalkerType, WalkathonType, StreamingType, MessagesType
+from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType
 
 
 class Query(graphene.ObjectType):
@@ -11,6 +11,14 @@ class Query(graphene.ObjectType):
     walkathon = graphene.Field(WalkathonType, year=graphene.Int())
     messages = graphene.List(MessagesType)
     streams = graphene.List(StreamingType)
+    me = graphene.Field(UserType)
+
+    def resolve_me(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Not logged in')
+
+        return user
 
     def resolve_streams(self, info):
         user_profile = info.context.user

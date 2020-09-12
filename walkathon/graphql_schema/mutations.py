@@ -1,9 +1,8 @@
 import graphene
 from graphql import GraphQLError
-
-
 from ..helpers.streaming import handle_stream_update_or_create
 from ..helpers.walker import WalkerHelper
+from ..helpers.common import iso_string_to_datetime
 from ..models import Walker, Streaming
 from .types import WalkerType, StreamingType, UserType
 
@@ -74,9 +73,17 @@ class UpdateWalker(graphene.Mutation):
     walker = graphene.Field(WalkerType)
 
     def mutate(self, info, walker_input):
+        print(walker_input)
+
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to create a walker profile!')
+        if walker_input.time_ended:
+            walker_input['time_ended'] = iso_string_to_datetime(walker_input.time_ended)
+        if walker_input.time_started:
+            walker_input['time_started'] = iso_string_to_datetime(walker_input.time_started)
+        print(walker_input)
+
         Walker.objects.filter(user_profile=user_profile).update(**walker_input)
         walker = Walker.objects.filter(user_profile=user_profile).first()
         return UpdateWalker(walker)
@@ -86,3 +93,5 @@ class Mutation(graphene.ObjectType):
     update_walker = UpdateWalker.Field()
     update_or_create_stream = UpdateOrCreateStream.Field()
     create_user = CreateUser.Field()
+
+
