@@ -1,7 +1,7 @@
 import graphene
 from graphql import GraphQLError
 
-from ..helpers.streaming import handle_stream_update_or_create
+from ..helpers.common import handle_model_update
 from ..helpers.walker import WalkerHelper
 from ..helpers.common import iso_string_to_datetime
 from ..models import Walker, Streaming
@@ -62,7 +62,7 @@ class UpdateOrCreateStream(graphene.Mutation):
             stream_id=stream_input.stream_id, created_by=user_profile, defaults={**stream_input})
         stream, created = Streaming.objects.filter(
             created_by=user_profile, stream_id=stream_input.stream_id).first()
-        handle_stream_update_or_create(stream)
+        handle_model_update('streams')
         return UpdateOrCreateStream(stream)
 
 

@@ -1,7 +1,8 @@
+from ithemba_walkathon.env import GLOBAL_TOPIC
 from ..clients.firebase import send_message
 
 
-def handle_stream_update_or_create(stream):
+def handle_stream_update_or_create():
     message = {
         'notification': {
             'title': 'Hi Man',
@@ -12,7 +13,7 @@ def handle_stream_update_or_create(stream):
             'fata': 'Hi Man',
             'man': 'Hi Man',
         },
-        'topic': 'walkathon_global'
+        'topic': GLOBAL_TOPIC
     }
 
     send_message(message)

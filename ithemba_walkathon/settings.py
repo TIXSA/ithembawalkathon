@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import django_heroku
+import ithemba_walkathon.env as env
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,10 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ee!r^oi3s8iezw(^yill5er^u=@5fecshgizc-xzr=+-7t$)+-'
+SECRET_KEY = env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.DEBUG
 
 ALLOWED_HOSTS = [
     '192.168.0.135',
@@ -85,11 +86,11 @@ WSGI_APPLICATION = 'ithemba_walkathon.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'SKU_Avon',
-        'USER': 'SKU_Avon',
-        'PASSWORD': 'M0t0r0la12345',
-        'HOST': 'dedi860.jnb3.host-h.net',
-        'PORT': '3306',
+        'NAME': env.DATABASE_NAME,
+        'USER': env.DATABASE_USER,
+        'PASSWORD': env.DATABASE_PASSWORD,
+        'HOST': env.DATABASE_HOST,
+        'PORT': env.DATABASE_PORT,
         'OPTIONS': {'charset': 'utf8mb4'},
     }
 }

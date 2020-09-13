@@ -1,3 +1,4 @@
+from ithemba_walkathon.env import GLOBAL_TOPIC
 from ..clients.firebase import send_message
 from datetime import datetime, timedelta
 
@@ -7,7 +8,7 @@ def handle_model_update(page):
         'data': {
             'refresh_app_page': str(page),
         },
-        'topic': 'dev_walkathon_global'
+        'topic': GLOBAL_TOPIC
     }
 
     send_message(message, True)

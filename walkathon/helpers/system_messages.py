@@ -1,3 +1,4 @@
+from ithemba_walkathon.env import GLOBAL_TOPIC
 from ..clients.firebase import send_message
 
 
@@ -14,7 +15,7 @@ def handle_system_message_update(system_message):
             'body': str(system_message.message),
             'image': str(system_message.image_url),
         },
-        'topic': 'dev_walkathon_global'
+        'topic': GLOBAL_TOPIC
     }
 
     send_message(message)
