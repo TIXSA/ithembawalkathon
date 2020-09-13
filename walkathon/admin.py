@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Walkathon, Walker, Streaming, SystemMessages, Entrant, Users, Teams
+from .models import Walkathon, Walker, Streaming, SystemMessages, Entrant, Users, Teams, InformationScreen
+
+
+class InformationScreenAdmin(admin.ModelAdmin):
+    list_display = ('information', 'security_tips', 'frequently_asked_questions', 'terms_and_conditions')
+
+
+admin.site.register(InformationScreen, InformationScreenAdmin)
 
 
 class WalkathonAdmin(admin.ModelAdmin):

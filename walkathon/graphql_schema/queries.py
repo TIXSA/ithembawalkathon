@@ -2,8 +2,8 @@ import graphene
 from graphql import GraphQLError
 import json
 
-from ..models import Walker, Walkathon, Streaming, SystemMessages, Entrant
-from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType, EntrantType
+from ..models import Walker, Walkathon, Streaming, SystemMessages, Entrant, InformationScreen
+from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType, EntrantType, InformationType
 
 
 class Query(graphene.ObjectType):
@@ -14,6 +14,10 @@ class Query(graphene.ObjectType):
     me = graphene.Field(UserType)
     walkers = graphene.List(WalkerType)
     entrant = graphene.Field(EntrantType)
+    information = graphene.Field(InformationType)
+
+    def resolve_information(self, info):
+        return InformationScreen.objects.first()
 
     def resolve_entrant(self, info):
         user_profile = info.context.user

@@ -201,3 +201,15 @@ class Streaming(models.Model):
     def save(self, *args, **kwargs):
         handle_model_update('streams')
         super(Streaming, self).save(*args, **kwargs)
+
+
+class InformationScreen(models.Model):
+    information = models.TextField()
+    security_tips = models.TextField()
+    frequently_asked_questions = models.TextField()
+    terms_and_conditions = models.TextField()
+
+    def save(self, *args, **kwargs):
+        handle_model_update('information')
+        super(InformationScreen, self).save(*args, **kwargs)
+
