@@ -1,12 +1,17 @@
 from django.contrib.auth import get_user_model
 
 from graphene_django import DjangoObjectType
-from ..models import Walker, Walkathon, SystemMessages, Streaming
+from ..models import Walker, Walkathon, SystemMessages, Streaming, Entrant
 
 
 class UserType(DjangoObjectType):
     class Meta:
         model = get_user_model()
+
+
+class EntrantType(DjangoObjectType):
+    class Meta:
+        model = Entrant
 
 
 class WalkerType(DjangoObjectType):

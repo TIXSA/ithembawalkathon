@@ -93,6 +93,10 @@ class Entrant(models.Model):
     acc_date = models.DateTimeField(blank=True, null=True)
     complete = models.CharField(max_length=50, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        handle_model_update('entrant')
+        super(Entrant, self).save(*args, **kwargs)
+
     class Meta:
         managed = False
         db_table = 'entrant'

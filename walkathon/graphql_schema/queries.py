@@ -2,8 +2,8 @@ import graphene
 from graphql import GraphQLError
 import json
 
-from ..models import Walker, Walkathon, Streaming, SystemMessages
-from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType
+from ..models import Walker, Walkathon, Streaming, SystemMessages, Entrant
+from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType, EntrantType
 
 
 class Query(graphene.ObjectType):
@@ -13,6 +13,14 @@ class Query(graphene.ObjectType):
     streams = graphene.List(StreamingType)
     me = graphene.Field(UserType)
     walkers = graphene.List(WalkerType)
+    entrant = graphene.Field(EntrantType)
+
+    def resolve_entrant(self, info):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get an entrant profile!')
+        walker = Walker.objects.filter(user_profile=user_profile).first()
+        return Entrant.objects.filter(uid=walker.uid).first()
 
     def resolve_me(self, info):
         user = info.context.user
