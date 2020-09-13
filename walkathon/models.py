@@ -160,6 +160,7 @@ class Walkathon(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+    banners = models.TextField(default=[])
 
     def save(self, *args, **kwargs):
         handle_model_update('walkathon')
