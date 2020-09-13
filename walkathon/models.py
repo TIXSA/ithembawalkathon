@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from walkathon.helpers.system_messages import handle_system_message_update
+from walkathon.helpers.common import handle_model_update
 
 MESSAGE_TYPE_CHOICES = (
     ('Individual', 'System Generated and Walker Activity Related'),
@@ -25,6 +26,7 @@ SEND_CONDITION_CHOICES = (
 
 class Users(models.Model):
     uid = models.AutoField(primary_key=True)
+    long_uid = models.IntegerField()
     username = models.CharField(max_length=50, blank=True, null=True)
     password = models.CharField(max_length=60, blank=True, null=True)
     chooser = models.CharField(max_length=50, blank=True, null=True)
@@ -91,6 +93,10 @@ class Entrant(models.Model):
     acc_date = models.DateTimeField(blank=True, null=True)
     complete = models.CharField(max_length=50, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        handle_model_update('entrant')
+        super(Entrant, self).save(*args, **kwargs)
+
     class Meta:
         managed = False
         db_table = 'entrant'
@@ -120,11 +126,12 @@ class Teams(models.Model):
 
 
 class Walker(models.Model):
+    uid = models.IntegerField(default=0)
     walker_number = models.CharField(max_length=255, default=0000)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     distance_to_walk = models.CharField(max_length=255, null=True, default=8)
     fcm_token = models.TextField(null=True, blank=True)
-    total_walked_distance = models.IntegerField(null=True, default=0)
+    total_walked_distance = models.CharField(null=True, default=0, max_length=20)
     walk_method = models.CharField(max_length=255, null=True, default='Route')
     team = models.CharField(max_length=255, null=True, blank=True)
     device_type = models.CharField(max_length=20, null=True, blank=True)
@@ -135,6 +142,11 @@ class Walker(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
     messages_read = models.TextField(null=True, default=[])
+    messages_received = models.TextField(null=True, default=[])
+    walker_leader = models.BooleanField(default=False)
+    generated_username = models.CharField(max_length=255, null=True, blank=True)
+    generated_password = models.CharField(max_length=255, null=True, blank=True)
+    route_coordinates = models.TextField(default=[])
 
     def __str__(self):
         return self.walker_number
@@ -148,6 +160,11 @@ class Walkathon(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+    banners = models.TextField(default=[])
+
+    def save(self, *args, **kwargs):
+        handle_model_update('walkathon')
+        super(Walkathon, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -182,3 +199,19 @@ class Streaming(models.Model):
     stream_started = models.BooleanField(default=False)
     stream_ended = models.BooleanField(default=False)
     stream_name = models.CharField(max_length=500, default='')
+
+    def save(self, *args, **kwargs):
+        handle_model_update('streams')
+        super(Streaming, self).save(*args, **kwargs)
+
+
+class InformationScreen(models.Model):
+    information = models.TextField()
+    security_tips = models.TextField()
+    frequently_asked_questions = models.TextField()
+    terms_and_conditions = models.TextField()
+
+    def save(self, *args, **kwargs):
+        handle_model_update('information')
+        super(InformationScreen, self).save(*args, **kwargs)
+

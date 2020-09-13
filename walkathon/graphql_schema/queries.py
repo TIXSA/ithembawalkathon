@@ -2,8 +2,8 @@ import graphene
 from graphql import GraphQLError
 import json
 
-from ..models import Walker, Walkathon, Streaming, SystemMessages
-from .types import WalkerType, WalkathonType, StreamingType, MessagesType
+from ..models import Walker, Walkathon, Streaming, SystemMessages, Entrant, InformationScreen
+from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType, EntrantType, InformationType
 
 
 class Query(graphene.ObjectType):
@@ -11,6 +11,27 @@ class Query(graphene.ObjectType):
     walkathon = graphene.Field(WalkathonType, year=graphene.Int())
     messages = graphene.List(MessagesType)
     streams = graphene.List(StreamingType)
+    me = graphene.Field(UserType)
+    walkers = graphene.List(WalkerType)
+    entrant = graphene.Field(EntrantType)
+    information = graphene.Field(InformationType)
+
+    def resolve_information(self, info):
+        return InformationScreen.objects.first()
+
+    def resolve_entrant(self, info):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get an entrant profile!')
+        walker = Walker.objects.filter(user_profile=user_profile).first()
+        return Entrant.objects.filter(uid=walker.uid).first()
+
+    def resolve_me(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Not logged in')
+
+        return user
 
     def resolve_streams(self, info):
         user_profile = info.context.user
@@ -31,5 +52,14 @@ class Query(graphene.ObjectType):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to get messages!')
-        return SystemMessages.objects.filter(message_sent=True).order_by('updated')\
+        walker = Walker.objects.filter(user_profile=user_profile).first()
+        return SystemMessages.objects.filter(pk__in=json.loads(walker.messages_received)).order_by('updated')\
             .only('title', 'message', 'image_url')
+
+    def resolve_walkers(self, info):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to get walkers!')
+        walker_leader = Walker.objects.filter(user_profile=user_profile).first()
+        walkers = Walker.objects.filter(uid=walker_leader.uid).exclude(user_profile=user_profile).all()
+        return walkers

@@ -1,9 +1,39 @@
 import graphene
 from graphql import GraphQLError
 
-from ..helpers.streaming import handle_stream_update_or_create
+from ..helpers.common import handle_model_update
+from ..helpers.walker import WalkerHelper
+from ..helpers.common import iso_string_to_datetime
 from ..models import Walker, Streaming
-from .types import WalkerType, StreamingType
+from .types import WalkerType, StreamingType, UserType
+
+
+class CreateUser(graphene.Mutation):
+    user = graphene.Field(UserType)
+
+    class Arguments:
+        username = graphene.String(required=True)
+        password = graphene.String(required=True)
+
+    def mutate(self, info, username, password):
+        if not username or not password:
+            raise GraphQLError('Enter valid username and password')
+
+        user = WalkerHelper(username, password).create_new_walker()
+        return CreateUser(user=user)
+
+
+class ResetPassword(graphene.Mutation):
+    response = graphene.String()
+
+    class Arguments:
+        username = graphene.String(required=True)
+
+    def mutate(self, info, username):
+        if not username:
+            raise GraphQLError('Enter valid username')
+
+        return ResetPassword('Password reset successful, please check your ' + 'emails')
 
 
 class StreamInput(graphene.InputObjectType):
@@ -32,14 +62,14 @@ class UpdateOrCreateStream(graphene.Mutation):
             stream_id=stream_input.stream_id, created_by=user_profile, defaults={**stream_input})
         stream, created = Streaming.objects.filter(
             created_by=user_profile, stream_id=stream_input.stream_id).first()
-        handle_stream_update_or_create(stream)
+        handle_model_update('streams')
         return UpdateOrCreateStream(stream)
 
 
 class WalkerInput(graphene.InputObjectType):
     fcm_token = graphene.String()
     distance_to_walk = graphene.String()
-    total_walked_distance = graphene.Int()
+    total_walked_distance = graphene.String()
     walk_method = graphene.String()
     device_type = graphene.String()
     steps_walked = graphene.String()
@@ -47,6 +77,8 @@ class WalkerInput(graphene.InputObjectType):
     time_ended = graphene.String()
     milestones = graphene.String()
     messages_read = graphene.String()
+    messages_received = graphene.String()
+    route_coordinates = graphene.String()
 
 
 class UpdateWalker(graphene.Mutation):
@@ -59,11 +91,39 @@ class UpdateWalker(graphene.Mutation):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to create a walker profile!')
+        if walker_input.time_ended:
+            walker_input['time_ended'] = iso_string_to_datetime(walker_input.time_ended)
+        if walker_input.time_started:
+            walker_input['time_started'] = iso_string_to_datetime(walker_input.time_started)
+
         Walker.objects.filter(user_profile=user_profile).update(**walker_input)
         walker = Walker.objects.filter(user_profile=user_profile).first()
         return UpdateWalker(walker)
 
 
+class ContactUsInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
+    contact = graphene.String(required=True)
+    message = graphene.String(required=True)
+
+
+class IncomingContactUsMessage(graphene.Mutation):
+    class Arguments:
+        contact_us_input = ContactUsInput(required=True)
+
+    feedback = graphene.String()
+
+    def mutate(self, info, contact_us_input):
+        user_profile = info.context.user
+        if user_profile.is_anonymous:
+            raise GraphQLError('You must be logged to create a walker profile!')
+
+        return IncomingContactUsMessage('done')
+
+
 class Mutation(graphene.ObjectType):
     update_walker = UpdateWalker.Field()
     update_or_create_stream = UpdateOrCreateStream.Field()
+    create_user = CreateUser.Field()
+    incoming_contact_us_message = IncomingContactUsMessage.Field()
+    reset_password = ResetPassword.Field()

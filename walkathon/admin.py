@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Walkathon, Walker, Streaming, SystemMessages, Entrant, Users, Teams
+from .models import Walkathon, Walker, Streaming, SystemMessages, Entrant, Users, Teams, InformationScreen
+
+
+class InformationScreenAdmin(admin.ModelAdmin):
+    list_display = ('information', 'security_tips', 'frequently_asked_questions', 'terms_and_conditions')
+
+
+admin.site.register(InformationScreen, InformationScreenAdmin)
 
 
 class WalkathonAdmin(admin.ModelAdmin):
@@ -32,7 +39,7 @@ admin.site.register(SystemMessages, SystemMessagesAdmin)
 
 
 class EntrantAdmin(admin.ModelAdmin):
-    list_display = ('uid', 'username', 'total_amount', 'manual_paid', 'payfast_paid', 'complete')
+    list_display = ('uid', 'eid', 'team_name', 'walk_distance', 'total_amount',  'preferred_communication', 'manual_paid_amount', 'payfast_paid_amount', )
 
 
 admin.site.register(Entrant, EntrantAdmin)
