@@ -131,7 +131,7 @@ class Walker(models.Model):
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     distance_to_walk = models.CharField(max_length=255, null=True, default=8)
     fcm_token = models.TextField(null=True, blank=True)
-    total_walked_distance = models.IntegerField(null=True, default=0)
+    total_walked_distance = models.CharField(null=True, default=0, max_length=20)
     walk_method = models.CharField(max_length=255, null=True, default='Route')
     team = models.CharField(max_length=255, null=True, blank=True)
     device_type = models.CharField(max_length=20, null=True, blank=True)
@@ -146,6 +146,7 @@ class Walker(models.Model):
     walker_leader = models.BooleanField(default=False)
     generated_username = models.CharField(max_length=255, null=True, blank=True)
     generated_password = models.CharField(max_length=255, null=True, blank=True)
+    route_coordinates = models.TextField(default=[])
 
     def __str__(self):
         return self.walker_number
