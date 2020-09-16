@@ -1,9 +1,10 @@
-import graphene
-from graphql import GraphQLError
 import json
 
-from ..models import Walker, Walkathon, Streaming, SystemMessages, Entrant, InformationScreen
+import graphene
+from graphql import GraphQLError
+
 from .types import WalkerType, WalkathonType, StreamingType, MessagesType, UserType, EntrantType, InformationType
+from ..models import Walker, Walkathon, Streaming, SystemMessages, Entrant, InformationScreen
 
 
 class Query(graphene.ObjectType):
@@ -53,8 +54,7 @@ class Query(graphene.ObjectType):
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to get messages!')
         walker = Walker.objects.filter(user_profile=user_profile).first()
-        return SystemMessages.objects.filter(pk__in=json.loads(walker.messages_received)).order_by('updated')\
-            .only('title', 'message', 'image_url')
+        return SystemMessages.objects.filter(pk__in=json.loads(walker.messages_received)).order_by('-updated')
 
     def resolve_walkers(self, info):
         user_profile = info.context.user
