@@ -1,7 +1,7 @@
 import os
 
 GLOBAL_TOPIC = os.getenv('GLOBAL_TOPIC', 'dev_walkathon_global')
-DEBUG = os.getenv('DEBUG', 'True')
+DEBUG = True if os.getenv('DEBUG', 'True') == 'True' else False
 SECRET_KEY = os.getenv('DEBUG', 'ee!r^oi3s8iezw(^yill5er^u=@5fecshgizc-xzr=+-7t$)+-')
 
 DATABASE_NAME = os.getenv('DATABASE_NAME', 'SKU_Avon')

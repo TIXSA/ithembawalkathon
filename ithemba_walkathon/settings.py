@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+
 import django_heroku
+
 import ithemba_walkathon.env as env
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -24,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if env.DEBUG == 'True' else False
+DEBUG = env.DEBUG
 
 ALLOWED_HOSTS = [
     '192.168.0.135',
