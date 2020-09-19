@@ -1,24 +1,13 @@
-import bcrypt
 import random
 import string
+
+import bcrypt
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from walkathon.models import Users, Entrant, Walker, Teams
 from graphql import GraphQLError
 
-errors = {
-    '0': 'Create walker error',
-    '1': 'You must first add a participant profile at www.ithembawalkathon.co.za',
-    '2': 'The amount paid is not equal to the total owed amount for all registered member(s)',
-    '3': 'The amount paid via PayFast is not equal to the total owed amount for all registered member(s)',
-    '4': 'The amount paid manually is not equal to the total owed amount for all registered member(s)',
-    '5': 'If you have completed your registration, please make sure you have made a manual or '
-         'PayFast payment.',
-    '6': 'Invalid login credentials',
-    '7': 'Invalid username',
-    '8': 'Password and username do not match',
-    '9': 'Profile was not completed correctly. Please email support at avonjustinewalk@s4u.co.za',
-}
+import walkathon.models as models
+from ithemba_walkathon import env
 
 
 class WalkerHelper:
@@ -39,7 +28,7 @@ class WalkerHelper:
         return self.django_user
 
     def get_team_members(self):
-        team = Teams.objects.filter(uid=self.php_user_uid).order_by('wid')
+        team = models.Teams.objects.filter(uid=self.php_user_uid).order_by('wid')
         if team:
             for index, member in enumerate(team):
                 if index == 0:
@@ -48,7 +37,7 @@ class WalkerHelper:
                     self.add_member_walker_profile(member)
         else:
             User.objects.filter(username=self.username).delete()
-            raise GraphQLError(errors['9'])
+            raise GraphQLError(env.ERRORS['9'])
 
     def add_member_walker_profile(self, member):
         generated_username = '{}_{}_{}'.format(member.wid, member.firstname, member.lastname)
@@ -61,7 +50,7 @@ class WalkerHelper:
         )
         member_django_user.set_password(generated_password)
         member_django_user.save()
-        Walker.objects.update_or_create(
+        models.Walker.objects.update_or_create(
             user_profile=member_django_user,
             defaults={
                 'uid': self.php_user_uid,
@@ -77,7 +66,7 @@ class WalkerHelper:
         self.django_user.first_name = self.entrant.firstname
         self.django_user.last_name = self.entrant.lastname
         self.django_user.save()
-        Walker.objects.update_or_create(
+        models.Walker.objects.update_or_create(
             user_profile=self.django_user,
             defaults={
                 'uid': self.php_user_uid,
@@ -89,31 +78,31 @@ class WalkerHelper:
         )
 
     def check_if_entrant_paid(self):
-        entrant = Entrant.objects.filter(uid=self.php_user_uid).first()
+        entrant = models.Entrant.objects.filter(uid=self.php_user_uid).first()
 
         if not entrant:
-            raise GraphQLError(errors['1'])
+            raise GraphQLError(env.ERRORS['1'])
         elif entrant.payfast_paid == 'Yes' and entrant.manual_paid == 'Yes':
             if entrant.total_amount == entrant.manual_paid_amount + entrant.payfast_paid_amount:
                 self.new_auth_user()
                 self.entrant = entrant
             else:
-                raise GraphQLError(errors['2'])
+                raise GraphQLError(env.ERRORS['2'])
 
         elif entrant.payfast_paid == 'Yes':
             if entrant.total_amount == entrant.payfast_paid_amount:
                 self.new_auth_user()
                 self.entrant = entrant
             else:
-                raise GraphQLError(errors['3'])
+                raise GraphQLError(env.ERRORS['3'])
         elif entrant.manual_paid == 'Yes':
             if entrant.total_amount == entrant.manual_paid_amount:
                 self.new_auth_user()
                 self.entrant = entrant
             else:
-                raise GraphQLError(errors['4'])
+                raise GraphQLError(env.ERRORS['4'])
         else:
-            raise GraphQLError(errors['5'])
+            raise GraphQLError(env.ERRORS['5'])
 
     def new_auth_user(self):
         user = get_user_model()(
@@ -127,13 +116,13 @@ class WalkerHelper:
     def check_if_user_in_users_table(self):
         django_user = User.objects.filter(username=self.username).first()
         if django_user:
-            raise GraphQLError(errors['6'])
+            raise GraphQLError(env.ERRORS['6'])
 
-        user = Users.objects.filter(username=self.username).first()
+        user = models.Users.objects.filter(username=self.username).first()
         if user:
             self.php_user = user
         else:
-            raise GraphQLError(errors['7'])
+            raise GraphQLError(env.ERRORS['7'])
 
     def check_if_input_password_same_as_user_password(self):
         if self.php_user.password.find('$2y$10$') == 0:
@@ -142,7 +131,7 @@ class WalkerHelper:
             passwords_match = self.password == self.php_user.password
 
         if not passwords_match:
-            raise GraphQLError(errors['8'])
+            raise GraphQLError(env.ERRORS['8'])
 
         if self.php_user.long_uid > 0:
             self.php_user_uid = self.php_user.long_uid

@@ -2,7 +2,7 @@ import graphene
 from graphql import GraphQLError
 
 from .types import WalkerType, StreamingType, UserType
-from ..helpers.common import handle_model_update, send_contact_us_message
+from ..helpers.common import handle_model_update, send_contact_us_message, send_password_reset_message
 from ..helpers.common import iso_string_to_datetime
 from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
@@ -30,10 +30,7 @@ class ResetPassword(graphene.Mutation):
         username = graphene.String(required=True)
 
     def mutate(self, info, username):
-        if not username:
-            raise GraphQLError('Enter valid username')
-
-        return ResetPassword('Password reset successful, please check your ' + 'emails')
+        return ResetPassword(send_password_reset_message(username))
 
 
 class StreamInput(graphene.InputObjectType):
