@@ -62,12 +62,12 @@ def send_password_reset_message(username):
     models.Users.objects.filter(uid=walker.uid).update(password=bcrpyt_password.decode('utf-8'))
     # 4. send comm to user
     entrant_profile = models.Entrant.objects.filter(uid=walker.uid).first()
-    preferred_comm_method = 'SMS' if 'sms' in entrant_profile.preferred_communication.lower() else 'EMAIL'
+    preferred_comm_method = 'text messages' if 'sms' in entrant_profile.preferred_communication.lower() else 'emails'
 
-    if preferred_comm_method == 'SMS':
-        email_to_send_to = entrant_profile.mobile + '@winsms.net'
-    else:
+    if preferred_comm_method == 'emails':
         email_to_send_to = entrant_profile.email
+    else:
+        email_to_send_to = entrant_profile.mobile + '@winsms.net'
 
     title = 'Your new iThemba Walkathon login credentials'
     message = '{}'.format(title)
@@ -84,4 +84,4 @@ def send_password_reset_message(username):
         fail_silently=False,
     )
 
-    return 'Password reset successful, please check your ' + preferred_comm_method.lower()
+    return 'Password reset successful, please check your ' + preferred_comm_method

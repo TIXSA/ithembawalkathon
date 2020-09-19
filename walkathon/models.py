@@ -1,8 +1,8 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 
-from walkathon.helpers.system_messages import handle_system_message_update
-from walkathon.helpers.common import handle_model_update
+import walkathon.helpers.common as common_helper
+import walkathon.helpers.system_messages as system_messages_helper
 
 MESSAGE_TYPE_CHOICES = (
     ('Individual', 'System Generated and Walker Activity Related'),
@@ -94,7 +94,7 @@ class Entrant(models.Model):
     complete = models.CharField(max_length=50, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        handle_model_update('entrant')
+        common_helper.handle_model_update('entrant')
         super(Entrant, self).save(*args, **kwargs)
 
     class Meta:
@@ -163,7 +163,7 @@ class Walkathon(models.Model):
     banners = models.TextField(default=[])
 
     def save(self, *args, **kwargs):
-        handle_model_update('walkathon')
+        common_helper.handle_model_update('walkathon')
         super(Walkathon, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -184,7 +184,7 @@ class SystemMessages(models.Model):
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        handle_system_message_update(self)
+        system_messages_helper.handle_system_message_update(self)
         super(SystemMessages, self).save(*args, **kwargs)
 
 
@@ -201,7 +201,7 @@ class Streaming(models.Model):
     stream_name = models.CharField(max_length=500, default='')
 
     def save(self, *args, **kwargs):
-        handle_model_update('streams')
+        common_helper.handle_model_update('streams')
         super(Streaming, self).save(*args, **kwargs)
 
 
@@ -212,6 +212,5 @@ class InformationScreen(models.Model):
     terms_and_conditions = models.TextField()
 
     def save(self, *args, **kwargs):
-        handle_model_update('information')
+        common_helper.handle_model_update('information')
         super(InformationScreen, self).save(*args, **kwargs)
-
