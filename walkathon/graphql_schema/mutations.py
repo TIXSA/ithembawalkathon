@@ -1,11 +1,11 @@
 import graphene
 from graphql import GraphQLError
 
-from ..helpers.common import handle_model_update
-from ..helpers.walker import WalkerHelper
-from ..helpers.common import iso_string_to_datetime
-from ..models import Walker, Streaming
 from .types import WalkerType, StreamingType, UserType
+from ..helpers.common import handle_model_update, send_contact_us_message
+from ..helpers.common import iso_string_to_datetime
+from ..helpers.walker import WalkerHelper
+from ..models import Walker, Streaming
 
 
 class CreateUser(graphene.Mutation):
@@ -117,7 +117,7 @@ class IncomingContactUsMessage(graphene.Mutation):
         user_profile = info.context.user
         if user_profile.is_anonymous:
             raise GraphQLError('You must be logged to create a walker profile!')
-
+        send_contact_us_message(user_profile, contact_us_input)
         return IncomingContactUsMessage('done')
 
 
