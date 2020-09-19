@@ -139,9 +139,6 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 GRAPHENE = {
     'SCHEMA': 'ithemba_walkathon.schema.schema',
 }
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 EMAIL_HOST = env.EMAIL_HOST
 EMAIL_PORT = env.EMAIL_PORT
