@@ -2,8 +2,9 @@ import graphene
 from graphql import GraphQLError
 
 from .types import WalkerType, StreamingType, UserType
-from ..helpers.common import handle_model_update, send_contact_us_message, send_password_reset_message
+from ..helpers.common import handle_model_update
 from ..helpers.common import iso_string_to_datetime
+from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message
 from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
 

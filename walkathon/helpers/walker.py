@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from graphql import GraphQLError
 
-import walkathon.models as models
 from ithemba_walkathon import env
+from walkathon.models import Walker, Entrant, Teams, Users
 
 
 class WalkerHelper:
@@ -28,7 +28,7 @@ class WalkerHelper:
         return self.django_user
 
     def get_team_members(self):
-        team = models.Teams.objects.filter(uid=self.php_user_uid).order_by('wid')
+        team = Teams.objects.filter(uid=self.php_user_uid).order_by('wid')
         if team:
             for index, member in enumerate(team):
                 if index == 0:
@@ -50,7 +50,7 @@ class WalkerHelper:
         )
         member_django_user.set_password(generated_password)
         member_django_user.save()
-        models.Walker.objects.update_or_create(
+        Walker.objects.update_or_create(
             user_profile=member_django_user,
             defaults={
                 'uid': self.php_user_uid,
@@ -66,7 +66,7 @@ class WalkerHelper:
         self.django_user.first_name = self.entrant.firstname
         self.django_user.last_name = self.entrant.lastname
         self.django_user.save()
-        models.Walker.objects.update_or_create(
+        Walker.objects.update_or_create(
             user_profile=self.django_user,
             defaults={
                 'uid': self.php_user_uid,
@@ -78,7 +78,7 @@ class WalkerHelper:
         )
 
     def check_if_entrant_paid(self):
-        entrant = models.Entrant.objects.filter(uid=self.php_user_uid).first()
+        entrant = Entrant.objects.filter(uid=self.php_user_uid).first()
 
         if not entrant:
             raise GraphQLError(env.ERRORS['1'])
@@ -118,7 +118,7 @@ class WalkerHelper:
         if django_user:
             raise GraphQLError(env.ERRORS['6'])
 
-        user = models.Users.objects.filter(username=self.username).first()
+        user = Users.objects.filter(username=self.username).first()
         if user:
             self.php_user = user
         else:
