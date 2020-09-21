@@ -21,6 +21,7 @@ def send_password_reset_message(username):
     generated_password = get_random_alphanumeric_string(10)
     # 2. Update django password
     member_django_user.set_password(generated_password)
+    member_django_user.save()
     # 3. update www.avonjustineithembawalkathon.co.za  password
     salt = bcrypt.gensalt()
     bcrpyt_password = bcrypt.hashpw(generated_password.encode('utf-8'), salt)

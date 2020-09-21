@@ -17,12 +17,6 @@ EMAIL_HOST_PASSWORD = 'Laser12345?'
 EMAIL_USE_TLS = True
 
 CONTACT_US_EMAIL = 'info@matineenterprises.com' if DEBUG else 'avonjustinewalk@s4u.co.za'
-# DATABASE_NAME = os.getenv('DATABASE_NAME', 'avonJ001')
-# DATABASE_USER = os.getenv('DATABASE_USER', 'avonJ001')
-# DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD', 'M0t0r0la12345')
-# DATABASE_HOST = os.getenv('DATABASE_HOST', 'dedi860.jnb3.host-h.net')
-# DATABASE_PORT = os.getenv('DATABASE_PORT', '3306')
-
 
 ERRORS = {
     '0': 'Create walker error',
@@ -39,3 +33,9 @@ ERRORS = {
     '10': 'You are registered as a team member, please contact the person who added you to their team to get your '
           'generated password',
 }
+
+# DATABASE_NAME = os.getenv('DATABASE_NAME', 'avonJ001')
+# DATABASE_USER = os.getenv('DATABASE_USER', 'avonJ001')
+# DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD', 'M0t0r0la12345')
+# DATABASE_HOST = os.getenv('DATABASE_HOST', 'dedi860.jnb3.host-h.net')
+# DATABASE_PORT = os.getenv('DATABASE_PORT', '3306')
