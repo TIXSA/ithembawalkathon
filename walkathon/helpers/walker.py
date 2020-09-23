@@ -125,7 +125,7 @@ class WalkerHelper:
             raise GraphQLError(env.ERRORS['7'])
 
     def check_if_input_password_same_as_user_password(self):
-        if self.php_user.password.find('$2y$10$') == 0:
+        if self.php_user.password.find('$2y$10$') == 0 or self.php_user.password.find('$2b$12$') == 0:
             passwords_match = bcrypt.checkpw(self.password.encode('utf-8'), self.php_user.password.encode('utf-8'))
         else:
             passwords_match = self.password == self.php_user.password
