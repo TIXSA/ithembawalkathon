@@ -1,1 +1,1 @@
-web: newrelic-admin run-program gunicorn ithemba_walkathon.wsgi
+newrelic-admin run-program web: gunicorn ithemba_walkathon.wsgi
