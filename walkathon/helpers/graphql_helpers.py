@@ -7,7 +7,7 @@ from django.utils.html import strip_tags
 from graphql import GraphQLError
 
 from ithemba_walkathon import env
-from walkathon.models import Walker, Users, Entrant, Teams
+from walkathon.models import Walker, Users, Entrant, Teams, SystemMessages
 from .walker import get_random_alphanumeric_string
 
 
@@ -140,3 +140,9 @@ def update_uids():
             walker.uid = int(team_member_profile.uid)
             walker.save()
         counter += 1
+
+@newrelic.agent.function_trace()
+def update_received_messages():
+    system_messages_ids = SystemMessages.objects.filter(message_sent=True).values_list('pk', flat=True)
+    json_list = list(system_messages_ids)
+    Walker.objects.update(messages_received=json_list)

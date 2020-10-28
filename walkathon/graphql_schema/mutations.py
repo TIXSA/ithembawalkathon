@@ -5,7 +5,8 @@ from graphql import GraphQLError
 from .types import WalkerType, StreamingType, UserType
 from ..helpers.common import handle_model_update
 from ..helpers.common import iso_string_to_datetime
-from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message, update_uids
+from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message, update_uids, \
+    update_received_messages
 from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
 
@@ -129,6 +130,8 @@ class DevWorks(graphene.Mutation):
     def mutate(self, info, message):
         if message == 'update_uids':
             django_rq.enqueue(update_uids)
+        if message == 'update_messages':
+            django_rq.enqueue(update_received_messages)
         return DevWorks('Done')
 
 
