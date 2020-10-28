@@ -1,6 +1,7 @@
 import bcrypt
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.forms import model_to_dict
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from graphql import GraphQLError
@@ -123,3 +124,23 @@ def send_html_email(email):
         fail_silently=False,
     )
     print('done sending email to : ', email)
+
+
+def update_uids():
+    done = 0
+    django_walkers = Walker.objects.all()
+    for walker in django_walkers:
+        walker_number = walker.walker_number
+        print('1 walker_number')
+        print(walker_number)
+        team_member_profile = Teams.objects.filter(wid=int(walker_number)).first()
+
+        if team_member_profile:
+            print('model_to_dict(team_member_profile)')
+            print(model_to_dict(team_member_profile))
+            print('team_member_profile.wid')
+            print(team_member_profile.wid)
+        done += 1
+        if done == 5:
+            break
+    # print(json.dumps(model_to_dict(django_walkers)))

@@ -4,7 +4,7 @@ from graphql import GraphQLError
 from .types import WalkerType, StreamingType, UserType
 from ..helpers.common import handle_model_update
 from ..helpers.common import iso_string_to_datetime
-from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message
+from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message, update_uids
 from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
 
@@ -119,9 +119,22 @@ class IncomingContactUsMessage(graphene.Mutation):
         return IncomingContactUsMessage('done')
 
 
+class DevWorks(graphene.Mutation):
+    class Arguments:
+        message = graphene.String()
+
+    result = graphene.String()
+
+    def mutate(self, info, message):
+        if message == 'update_uids':
+            update_uids()
+        return DevWorks('Done')
+
+
 class Mutation(graphene.ObjectType):
     update_walker = UpdateWalker.Field()
     update_or_create_stream = UpdateOrCreateStream.Field()
     create_user = CreateUser.Field()
     incoming_contact_us_message = IncomingContactUsMessage.Field()
     reset_password = ResetPassword.Field()
+    dev_works = DevWorks.Field()

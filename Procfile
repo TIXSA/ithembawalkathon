@@ -1,1 +1,1 @@
-web: gunicorn ithemba_walkathon.wsgi
+web: newrelic-admin gunicorn ithemba_walkathon.wsgi
