@@ -1,10 +1,12 @@
 import bcrypt
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from graphql import GraphQLError
 
 from ithemba_walkathon import env
-from walkathon.models import Walker, Users, Entrant
+from walkathon.models import Walker, Users, Entrant, Teams
 from .walker import get_random_alphanumeric_string
 
 
@@ -68,3 +70,56 @@ def send_contact_us_message(user_profile, contact_us_form):
         [env.CONTACT_US_EMAIL],
         fail_silently=False,
     )
+
+
+def send_blast_task():
+    entrants = Entrant.objects.all()
+    sms_recipients = []
+    email_recipients = []
+    for entrant in entrants:
+        preferred_method = 'email' if 'email' in entrant.preferred_communication.lower() else 'sms'
+        team_for_entrant = Teams.objects.filter(uid=entrant.uid).all()
+        for team_member in team_for_entrant:
+            print('.')
+            if preferred_method == 'email':
+                if team_member.email not in email_recipients:
+                    # send_html_email([team_member.email])
+                    email_recipients.append(team_member.email)
+            else:
+                mobile_email = team_member.mobile + '@winsms.net'
+                if mobile_email not in sms_recipients:
+                    sms_recipients.append(mobile_email)
+    send_blast_sms_messages(['0760621827' + '@winsms.net'])
+    send_html_email(['info@matineenterprises.com'])
+    print('Done')
+
+
+def send_blast_sms_messages(recipient_list):
+    print('sending sms messages to recipient_list: ', recipient_list)
+    title = 'Enjoy the new Walkathon App! See details below'
+    message = 'Keeping abreast of cancer awareness & promoting early detection is at your fingertips through the ' \
+              'iThemba Walkathon App! Download now from Play Store\App Store! '
+    send_mail(
+        title,
+        message,
+        env.EMAIL_HOST_USER,
+        recipient_list=recipient_list,
+        fail_silently=False,
+    )
+    print('done sending sms messages to recipient_list: ', recipient_list)
+
+
+def send_html_email(email):
+    print('sending email to : ', email)
+    title = 'Enjoy the new Walkathon App! See details below'
+    html_message = render_to_string('app_available_email.html')
+    message = strip_tags(html_message)
+    send_mail(
+        title,
+        message,
+        env.EMAIL_HOST_USER,
+        recipient_list=email,
+        html_message=html_message,
+        fail_silently=False,
+    )
+    print('done sending email to : ', email)
