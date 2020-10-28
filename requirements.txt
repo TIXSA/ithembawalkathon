@@ -35,7 +35,6 @@ httplib2==0.18.1
 idna==2.10
 msgpack==1.0.0
 mysqlclient==2.0.1
-newrelic==5.22.0.151
 promise==2.3
 protobuf==3.13.0
 psycopg2==2.8.5
