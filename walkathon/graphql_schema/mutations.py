@@ -1,3 +1,4 @@
+import django_rq
 import graphene
 from graphql import GraphQLError
 
@@ -127,7 +128,7 @@ class DevWorks(graphene.Mutation):
 
     def mutate(self, info, message):
         if message == 'update_uids':
-            update_uids()
+            django_rq.enqueue(update_uids)
         return DevWorks('Done')
 
 

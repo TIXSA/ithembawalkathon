@@ -10,6 +10,8 @@ DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD', 'M0t0r0la12345')
 DATABASE_HOST = os.getenv('DATABASE_HOST', 'dedi860.jnb3.host-h.net')
 DATABASE_PORT = os.getenv('DATABASE_PORT', '3306')
 
+REDISTOGO_URL = os.getenv('REDISTOGO_URL', 'redis://redistogo:b36d757e1504b27d8aafd6eb8d2a3f0f@scat.redistogo.com:10526/')
+
 EMAIL_HOST = 'mail.avonjustineithembawalkathon.co.za'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'donotreply@avonjustineithembawalkathon.co.za'

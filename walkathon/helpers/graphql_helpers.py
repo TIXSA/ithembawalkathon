@@ -1,4 +1,5 @@
 import bcrypt
+import newrelic.agent
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -125,6 +126,7 @@ def send_html_email(email):
     print('done sending email to : ', email)
 
 
+@newrelic.agent.function_trace()
 def update_uids():
     counter = 0
     django_walkers = Walker.objects.all()

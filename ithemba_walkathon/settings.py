@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
+    'django_rq'
 ]
 
 MIDDLEWARE = [
@@ -138,6 +139,13 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 GRAPHENE = {
     'SCHEMA': 'ithemba_walkathon.schema.schema',
+}
+
+RQ_QUEUES = {
+    'default': {
+        'URL': env.REDISTOGO_URL,
+        'DEFAULT_TIMEOUT': 500,
+    }
 }
 
 EMAIL_HOST = env.EMAIL_HOST
