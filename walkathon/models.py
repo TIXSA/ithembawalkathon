@@ -126,7 +126,7 @@ class Teams(models.Model):
 
 
 class Walker(models.Model):
-    uid = models.IntegerField(default=0)
+    uid = models.BigIntegerField(default=0)
     walker_number = models.CharField(max_length=255, default=0000)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     distance_to_walk = models.CharField(max_length=255, null=True, default=8)
