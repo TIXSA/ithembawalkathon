@@ -133,7 +133,7 @@ class DevWorks(graphene.Mutation):
         if message == 'update_messages':
             django_rq.enqueue(update_received_messages)
         if message == 'app_updated_blast':
-            send_blast_task()
+            django_rq.enqueue(send_blast_task)
         return DevWorks('Done')
 
 

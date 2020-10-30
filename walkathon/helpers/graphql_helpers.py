@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django_rq import job
 from graphql import GraphQLError
 
 from ithemba_walkathon import env
@@ -75,8 +76,8 @@ def send_contact_us_message(user_profile, contact_us_form):
     )
 
 
+@job('default', timeout=10000)
 def send_blast_task():
-
     team_members = Teams.objects.all()
     sms_recipients = []
     email_recipients = []
@@ -86,8 +87,8 @@ def send_blast_task():
         print('Count ', count)
         print('walker id ', team_member.wid)
         if team_member.email and team_member.email not in email_recipients:
-            # send_html_email([team_member.email])
-            send_html_email(['info@matineenterprises.com'])
+            send_html_email([team_member.email])
+            # send_html_email(['info@matineenterprises.com'])
             email_recipients.append(team_member.email)
 
         if team_member.mobile:
@@ -97,8 +98,8 @@ def send_blast_task():
         if count == 1:
             break
 
-    # send_blast_sms_messages(sms_recipients)
-    send_blast_sms_messages(['0760621827' + '@winsms.net'])
+    send_blast_sms_messages(sms_recipients)
+    # send_blast_sms_messages(['0760621827' + '@winsms.net'])
 
     print('Done')
 
@@ -107,7 +108,7 @@ def send_blast_sms_messages(recipient_list):
     print('sending sms messages to recipient_list: ', recipient_list)
     title = 'Enjoy the new Walkathon App! See details below'
     message = 'Download your new Walkathon App or update your existing App by visiting your Play Store or App Stores ' \
-              'for an amazing Walkathon experience tomorrow! Tap on https://rb.gy/75di2v'
+              'for an amazing Walkathon experience tomorrow! Tap on https://bit.ly/37UG5Ns'
     send_mail(
         title,
         message,
@@ -148,6 +149,7 @@ def update_uids():
             walker.uid = int(team_member_profile.uid)
             walker.save()
         counter += 1
+
 
 @newrelic.agent.function_trace()
 def update_received_messages():
