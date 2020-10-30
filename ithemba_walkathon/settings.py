@@ -144,7 +144,7 @@ GRAPHENE = {
 RQ_QUEUES = {
     'default': {
         'URL': env.REDISTOGO_URL,
-        'DEFAULT_TIMEOUT': 10000,
+        'DEFAULT_TIMEOUT': 20000,
     }
 }
 

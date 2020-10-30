@@ -83,11 +83,12 @@ def login_everyone():
     all_paid_entrants = Entrant.objects.filter(
         Q(payfast_paid='Yes') |
         Q(manual_paid='Yes')
-        )
+    )
     count = 1
     for paid_entrant in all_paid_entrants:
         print('count', count)
         if not Walker.objects.filter(uid=paid_entrant.uid).exists():
+            count += 1
             entrant_team_members = Teams.objects.filter(uid=paid_entrant.uid)
             print('entrant_team_members', entrant_team_members)
             for entrant_team_member in entrant_team_members:
@@ -124,18 +125,48 @@ def login_everyone():
                     generated_username,
                     generated_password
                 )
-            count += 1
 
-        if count == 2:
-            break
 
-@job('default', timeout=10000)
 def login_already_created():
-    non_logged_in_walkers = Walker.objects.filter(fcm_toke)
+    non_logged_in_walkers = Walker.objects.filter(fcm_token__isnull=True)
+    count = 0
+    for non_logged_in_walker in non_logged_in_walkers:
+        count += 1
+        print('count', count)
+        print('non_logged_in_walker walker_number', non_logged_in_walker.walker_number)
+        team_member_profile = Teams.objects.filter(wid=non_logged_in_walker.walker_number).first()
+        emails_to_send_to = []
+
+        if team_member_profile.mobile:
+            emails_to_send_to.append(team_member_profile.mobile + '@winsms.net')
+        if team_member_profile.email:
+            emails_to_send_to.append(team_member_profile.email)
+
+        generated_username = '{}'.format(team_member_profile.wid)
+        generated_password = get_random_numeric_string(10)
+        user = User.objects.filter(pk=non_logged_in_walker.user_profile.pk).first()
+
+        user.username = generated_username
+        user.set_password(generated_password)
+        user.save()
+
+        Walker.objects.update_or_create(
+            user_profile=user,
+            defaults={
+                'generated_username': generated_username,
+                'generated_password': generated_password,
+            }
+        )
+        send_new_login_credentials(
+            emails_to_send_to,
+            team_member_profile.firstname,
+            generated_username,
+            generated_password
+        )
+
 
 def send_new_login_credentials(emails_to_send_to, first_name, generated_username, password):
     print('sending sms messages to recipient_list: ', emails_to_send_to)
-    emails_to_send_to = ['info@matineenterprises.com', '0760621827' + '@winsms.net']
     title = 'Enjoy the new Walkathon App! See details below'
     message = 'Hi {} we have noticed that you have paid but not logged into the iThemba Walkathon App, here are your ' \
               'new login credentials. \n\nUsername: {} \nPassword: {} '.format(first_name, generated_username, password)
@@ -149,7 +180,6 @@ def send_new_login_credentials(emails_to_send_to, first_name, generated_username
     print('done sending sms messages to recipient_list: ', emails_to_send_to)
 
 
-@job('default', timeout=10000)
 def send_blast_task():
     team_members = Teams.objects.all()
     sms_recipients = []
@@ -159,7 +189,7 @@ def send_blast_task():
         count += 1
         print('Count ', count)
         print('walker id ', team_member.wid)
-        if count > 374:
+        if count > 5016:
             if team_member.email and team_member.email not in email_recipients:
                 send_html_email([team_member.email])
                 # send_html_email(['info@matineenterprises.com'])
