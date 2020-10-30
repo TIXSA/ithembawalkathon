@@ -86,15 +86,16 @@ def send_blast_task():
         count += 1
         print('Count ', count)
         print('walker id ', team_member.wid)
-        if team_member.email and team_member.email not in email_recipients:
-            send_html_email([team_member.email])
-            # send_html_email(['info@matineenterprises.com'])
-            email_recipients.append(team_member.email)
+        if count > 374:
+            if team_member.email and team_member.email not in email_recipients:
+                send_html_email([team_member.email])
+                # send_html_email(['info@matineenterprises.com'])
+                email_recipients.append(team_member.email)
 
-        if team_member.mobile:
-            mobile_email = team_member.mobile + '@winsms.net'
-            if mobile_email not in sms_recipients:
-                sms_recipients.append(mobile_email)
+            if team_member.mobile:
+                mobile_email = team_member.mobile + '@winsms.net'
+                if mobile_email not in sms_recipients:
+                    sms_recipients.append(mobile_email)
 
     send_blast_sms_messages(sms_recipients)
     # send_blast_sms_messages(['0760621827' + '@winsms.net'])
