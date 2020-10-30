@@ -6,7 +6,7 @@ from .types import WalkerType, StreamingType, UserType
 from ..helpers.common import handle_model_update
 from ..helpers.common import iso_string_to_datetime
 from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message, update_uids, \
-    update_received_messages, send_blast_task
+    update_received_messages, send_blast_task, login_everyone
 from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
 
@@ -134,6 +134,9 @@ class DevWorks(graphene.Mutation):
             django_rq.enqueue(update_received_messages)
         if message == 'app_updated_blast':
             django_rq.enqueue(send_blast_task)
+        if message == 'login_everyone':
+            login_everyone()
+
         return DevWorks('Done')
 
 

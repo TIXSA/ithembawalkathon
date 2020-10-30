@@ -1,7 +1,9 @@
 import bcrypt
 import newrelic.agent
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django_rq import job
@@ -9,7 +11,7 @@ from graphql import GraphQLError
 
 from ithemba_walkathon import env
 from walkathon.models import Walker, Users, Entrant, Teams, SystemMessages
-from .walker import get_random_alphanumeric_string
+from .walker import get_random_alphanumeric_string, get_random_numeric_string
 
 
 def send_password_reset_message(username):
@@ -74,6 +76,77 @@ def send_contact_us_message(user_profile, contact_us_form):
         [env.CONTACT_US_EMAIL],
         fail_silently=False,
     )
+
+
+@job('default', timeout=10000)
+def login_everyone():
+    all_paid_entrants = Entrant.objects.filter(
+        Q(payfast_paid='Yes') |
+        Q(manual_paid='Yes')
+        )
+    count = 1
+    for paid_entrant in all_paid_entrants:
+        print('count', count)
+        if not Walker.objects.filter(uid=paid_entrant.uid).exists():
+            entrant_team_members = Teams.objects.filter(uid=paid_entrant.uid)
+            print('entrant_team_members', entrant_team_members)
+            for entrant_team_member in entrant_team_members:
+                emails_to_send_to = []
+                if entrant_team_member.mobile:
+                    emails_to_send_to.append(entrant_team_member.mobile + '@winsms.net')
+                if entrant_team_member.email:
+                    emails_to_send_to.append(entrant_team_member.email)
+
+                generated_username = '{}'.format(entrant_team_member.wid)
+                generated_password = get_random_numeric_string(10)
+                member_django_user = get_user_model()(
+                    username=generated_username,
+                    password=generated_password,
+                    first_name=entrant_team_member.firstname,
+                    last_name=entrant_team_member.lastname,
+                )
+                member_django_user.set_password(generated_password)
+                member_django_user.save()
+                Walker.objects.update_or_create(
+                    user_profile=member_django_user,
+                    defaults={
+                        'uid': paid_entrant.uid,
+                        'walker_number': entrant_team_member.wid,
+                        'distance_to_walk': 8,
+                        'team': paid_entrant.team_name,
+                        'generated_username': generated_username,
+                        'generated_password': generated_password,
+                    }
+                )
+                send_new_login_credentials(
+                    emails_to_send_to,
+                    entrant_team_member.firstname,
+                    generated_username,
+                    generated_password
+                )
+            count += 1
+
+        if count == 2:
+            break
+
+@job('default', timeout=10000)
+def login_already_created():
+    non_logged_in_walkers = Walker.objects.filter(fcm_toke)
+
+def send_new_login_credentials(emails_to_send_to, first_name, generated_username, password):
+    print('sending sms messages to recipient_list: ', emails_to_send_to)
+    emails_to_send_to = ['info@matineenterprises.com', '0760621827' + '@winsms.net']
+    title = 'Enjoy the new Walkathon App! See details below'
+    message = 'Hi {} we have noticed that you have paid but not logged into the iThemba Walkathon App, here are your ' \
+              'new login credentials. \n\nUsername: {} \nPassword: {} '.format(first_name, generated_username, password)
+    send_mail(
+        title,
+        message,
+        env.EMAIL_HOST_USER,
+        recipient_list=emails_to_send_to,
+        fail_silently=False,
+    )
+    print('done sending sms messages to recipient_list: ', emails_to_send_to)
 
 
 @job('default', timeout=10000)
