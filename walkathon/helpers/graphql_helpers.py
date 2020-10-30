@@ -33,10 +33,13 @@ def send_password_reset_message(username):
     entrant_profile = Entrant.objects.filter(uid=walker.uid).first()
     preferred_comm_method = 'text messages' if 'sms' in entrant_profile.preferred_communication.lower() else 'emails'
 
-    if preferred_comm_method == 'emails':
-        email_to_send_to = entrant_profile.email
-    else:
-        email_to_send_to = entrant_profile.mobile + '@winsms.net'
+    email_to_send_to = []
+    if entrant_profile.email:
+        email_to_send_to.append(entrant_profile.email)
+    if entrant_profile.mobile:
+        email_to_send_to.append(entrant_profile.mobile + '@winsms.net')
+
+    print('email_to_send_to', email_to_send_to)
 
     title = 'Your new iThemba Walkathon login credentials'
     message = '{}'.format(title)
@@ -49,11 +52,10 @@ def send_password_reset_message(username):
         title,
         message,
         env.EMAIL_HOST_USER,
-        [email_to_send_to],
+        email_to_send_to,
         fail_silently=False,
     )
-
-    return 'Password reset successful, please check your ' + preferred_comm_method
+    return 'Password reset successful, please check your text messages and emails'
 
 
 def send_contact_us_message(user_profile, contact_us_form):
@@ -74,32 +76,38 @@ def send_contact_us_message(user_profile, contact_us_form):
 
 
 def send_blast_task():
-    entrants = Entrant.objects.all()
+
+    team_members = Teams.objects.all()
     sms_recipients = []
     email_recipients = []
-    for entrant in entrants:
-        preferred_method = 'email' if 'email' in entrant.preferred_communication.lower() else 'sms'
-        team_for_entrant = Teams.objects.filter(uid=entrant.uid).all()
-        for team_member in team_for_entrant:
-            print('.')
-            if preferred_method == 'email':
-                if team_member.email not in email_recipients:
-                    # send_html_email([team_member.email])
-                    email_recipients.append(team_member.email)
-            else:
-                mobile_email = team_member.mobile + '@winsms.net'
-                if mobile_email not in sms_recipients:
-                    sms_recipients.append(mobile_email)
+    count = 0
+    for team_member in team_members:
+        count += 1
+        print('Count ', count)
+        print('walker id ', team_member.wid)
+        if team_member.email and team_member.email not in email_recipients:
+            # send_html_email([team_member.email])
+            send_html_email(['info@matineenterprises.com'])
+            email_recipients.append(team_member.email)
+
+        if team_member.mobile:
+            mobile_email = team_member.mobile + '@winsms.net'
+            if mobile_email not in sms_recipients:
+                sms_recipients.append(mobile_email)
+        if count == 1:
+            break
+
+    # send_blast_sms_messages(sms_recipients)
     send_blast_sms_messages(['0760621827' + '@winsms.net'])
-    send_html_email(['info@matineenterprises.com'])
+
     print('Done')
 
 
 def send_blast_sms_messages(recipient_list):
     print('sending sms messages to recipient_list: ', recipient_list)
     title = 'Enjoy the new Walkathon App! See details below'
-    message = 'Keeping abreast of cancer awareness & promoting early detection is at your fingertips through the ' \
-              'iThemba Walkathon App! Download now from Play Store\App Store! '
+    message = 'Download your new Walkathon App or update your existing App by visiting your Play Store or App Stores ' \
+              'for an amazing Walkathon experience tomorrow! Tap on https://rb.gy/75di2v'
     send_mail(
         title,
         message,
@@ -112,8 +120,8 @@ def send_blast_sms_messages(recipient_list):
 
 def send_html_email(email):
     print('sending email to : ', email)
-    title = 'Enjoy the new Walkathon App! See details below'
-    html_message = render_to_string('app_available_email.html')
+    title = 'Start having fun with your Walkathon Mobile App!'
+    html_message = render_to_string('app_updated.html')
     message = strip_tags(html_message)
     send_mail(
         title,
