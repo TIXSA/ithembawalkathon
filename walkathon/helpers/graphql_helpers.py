@@ -95,8 +95,6 @@ def send_blast_task():
             mobile_email = team_member.mobile + '@winsms.net'
             if mobile_email not in sms_recipients:
                 sms_recipients.append(mobile_email)
-        if count == 1:
-            break
 
     send_blast_sms_messages(sms_recipients)
     # send_blast_sms_messages(['0760621827' + '@winsms.net'])
