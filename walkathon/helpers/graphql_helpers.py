@@ -139,7 +139,7 @@ def login_already_created():
     count = 0
     for non_logged_in_walker in non_logged_in_walkers:
         count += 1
-        if count > 34:
+        if count > 20:
 
             print('count', count)
             print('non_logged_in_walker walker_number', non_logged_in_walker.walker_number)

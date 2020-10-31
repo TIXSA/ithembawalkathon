@@ -40,8 +40,8 @@ class WalkerHelper:
             raise GraphQLError(env.ERRORS['9'])
 
     def add_member_walker_profile(self, member):
-        generated_username = '{}_{}_{}'.format(member.wid, member.firstname, member.lastname)
-        generated_password = get_random_alphanumeric_string(10)
+        generated_username = '{}'.format(member.wid)
+        generated_password = get_random_numeric_string(10)
         member_django_user = get_user_model()(
             username=generated_username,
             password=generated_password,
