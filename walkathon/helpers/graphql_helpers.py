@@ -89,42 +89,49 @@ def login_everyone():
         print('count', count)
         if not Walker.objects.filter(uid=paid_entrant.uid).exists():
             count += 1
-            entrant_team_members = Teams.objects.filter(uid=paid_entrant.uid)
-            print('entrant_team_members', entrant_team_members)
-            for entrant_team_member in entrant_team_members:
-                emails_to_send_to = []
-                if entrant_team_member.mobile:
-                    emails_to_send_to.append(entrant_team_member.mobile + '@winsms.net')
-                if entrant_team_member.email:
-                    emails_to_send_to.append(entrant_team_member.email)
+            if count > 203:
+                entrant_team_members = Teams.objects.filter(uid=paid_entrant.uid)
+                print('entrant_team_members', entrant_team_members)
+                for entrant_team_member in entrant_team_members:
+                    emails_to_send_to = []
+                    if entrant_team_member.mobile:
+                        emails_to_send_to.append(entrant_team_member.mobile + '@winsms.net')
+                    if entrant_team_member.email:
+                        emails_to_send_to.append(entrant_team_member.email)
 
-                generated_username = '{}'.format(entrant_team_member.wid)
-                generated_password = get_random_numeric_string(10)
-                member_django_user = get_user_model()(
-                    username=generated_username,
-                    password=generated_password,
-                    first_name=entrant_team_member.firstname,
-                    last_name=entrant_team_member.lastname,
-                )
-                member_django_user.set_password(generated_password)
-                member_django_user.save()
-                Walker.objects.update_or_create(
-                    user_profile=member_django_user,
-                    defaults={
-                        'uid': paid_entrant.uid,
-                        'walker_number': entrant_team_member.wid,
-                        'distance_to_walk': 8,
-                        'team': paid_entrant.team_name,
-                        'generated_username': generated_username,
-                        'generated_password': generated_password,
-                    }
-                )
-                send_new_login_credentials(
-                    emails_to_send_to,
-                    entrant_team_member.firstname,
-                    generated_username,
-                    generated_password
-                )
+                    generated_username = '{}'.format(entrant_team_member.wid)
+                    generated_password = get_random_numeric_string(10)
+                    member_django_user = get_user_model()(
+                        username=generated_username,
+                        password=generated_password,
+                        first_name=entrant_team_member.firstname,
+                        last_name=entrant_team_member.lastname,
+                    )
+                    member_django_user.set_password(generated_password)
+                    member_django_user.save()
+                    Walker.objects.update_or_create(
+                        user_profile=member_django_user,
+                        defaults={
+                            'uid': paid_entrant.uid,
+                            'walker_number': entrant_team_member.wid,
+                            'distance_to_walk': 8,
+                            'team': paid_entrant.team_name,
+                            'generated_username': generated_username,
+                            'generated_password': generated_password,
+                        }
+                    )
+                    send_new_login_credentials(
+                        emails_to_send_to,
+                        entrant_team_member.firstname,
+                        generated_username,
+                        generated_password
+                    )
+
+
+def create_app_admin():
+    member_django_user = User.objects.filter(username='ithemba').first()
+    member_django_user.set_password('walk')
+    member_django_user.save()
 
 
 def login_already_created():
@@ -132,37 +139,40 @@ def login_already_created():
     count = 0
     for non_logged_in_walker in non_logged_in_walkers:
         count += 1
-        print('count', count)
-        print('non_logged_in_walker walker_number', non_logged_in_walker.walker_number)
-        team_member_profile = Teams.objects.filter(wid=non_logged_in_walker.walker_number).first()
-        emails_to_send_to = []
+        if count > 34:
 
-        if team_member_profile.mobile:
-            emails_to_send_to.append(team_member_profile.mobile + '@winsms.net')
-        if team_member_profile.email:
-            emails_to_send_to.append(team_member_profile.email)
+            print('count', count)
+            print('non_logged_in_walker walker_number', non_logged_in_walker.walker_number)
+            team_member_profile = Teams.objects.filter(wid=non_logged_in_walker.walker_number).first()
+            if team_member_profile:
+                emails_to_send_to = []
 
-        generated_username = '{}'.format(team_member_profile.wid)
-        generated_password = get_random_numeric_string(10)
-        user = User.objects.filter(pk=non_logged_in_walker.user_profile.pk).first()
+                if team_member_profile.mobile:
+                    emails_to_send_to.append(team_member_profile.mobile + '@winsms.net')
+                if team_member_profile.email:
+                    emails_to_send_to.append(team_member_profile.email)
 
-        user.username = generated_username
-        user.set_password(generated_password)
-        user.save()
+                generated_username = '{}'.format(team_member_profile.wid)
+                generated_password = get_random_numeric_string(10)
+                user = User.objects.filter(pk=non_logged_in_walker.user_profile.pk).first()
 
-        Walker.objects.update_or_create(
-            user_profile=user,
-            defaults={
-                'generated_username': generated_username,
-                'generated_password': generated_password,
-            }
-        )
-        send_new_login_credentials(
-            emails_to_send_to,
-            team_member_profile.firstname,
-            generated_username,
-            generated_password
-        )
+                user.username = generated_username
+                user.set_password(generated_password)
+                user.save()
+
+                Walker.objects.update_or_create(
+                    user_profile=user,
+                    defaults={
+                        'generated_username': generated_username,
+                        'generated_password': generated_password,
+                    }
+                )
+                send_new_login_credentials(
+                    emails_to_send_to,
+                    team_member_profile.firstname,
+                    generated_username,
+                    generated_password
+                )
 
 
 def send_new_login_credentials(emails_to_send_to, first_name, generated_username, password):
@@ -189,7 +199,7 @@ def send_blast_task():
         count += 1
         print('Count ', count)
         print('walker id ', team_member.wid)
-        if count > 5016:
+        if count > 5821:
             if team_member.email and team_member.email not in email_recipients:
                 send_html_email([team_member.email])
                 # send_html_email(['info@matineenterprises.com'])
