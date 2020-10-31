@@ -1,8 +1,9 @@
 import os
+
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import messaging
 from firebase_admin import exceptions
+from firebase_admin import messaging
 
 credentials_path = os.path.join(
     os.path.dirname(__file__),
@@ -39,13 +40,22 @@ def build_message(message):
         priority='high'
     )
 
-    return messaging.Message(
-        data=message['data'],
-        notification=notification,
-        topic=message['topic'],
-        android=android,
-        apns=apns
-    )
+    if message.get('token', ''):
+        return messaging.Message(
+            data=message['data'],
+            notification=notification,
+            token=message['token'],
+            android=android,
+            apns=apns
+        )
+    else:
+        return messaging.Message(
+            data=message['data'],
+            notification=notification,
+            topic=message['topic'],
+            android=android,
+            apns=apns
+        )
 
 
 def build_refresh_message(message):

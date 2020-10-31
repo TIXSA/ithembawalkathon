@@ -2,8 +2,8 @@ from ithemba_walkathon.env import GLOBAL_TOPIC
 from ..clients.firebase import send_message
 
 
-def handle_system_message_update(system_message):
-    if system_message.message_sent:
+def handle_system_message_update(system_message, token=None):
+    if system_message.message_sent or token:
         print('Sending message to.... ', GLOBAL_TOPIC)
         message = {
             'notification': {
@@ -17,8 +17,11 @@ def handle_system_message_update(system_message):
                 'body': str(system_message.message),
                 'image': str(system_message.image_url),
             },
-            'topic': GLOBAL_TOPIC
         }
+        if token:
+            message['token'] = token
+        else:
+            message['topic'] = GLOBAL_TOPIC
 
         send_message(message)
     else:

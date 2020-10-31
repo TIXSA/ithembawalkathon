@@ -13,7 +13,6 @@ SEND_CONDITION_CHOICES = (
     ('4km1', '4 km 1st Milestone'),
     ('4km2', '4 km 2nd Milestone'),
     ('4km3', '4 km 3rd Milestone'),
-    ('4km4', '4 km 4th Milestone'),
     ('8km1', '8 km 1st Milestone'),
     ('8km2', '8 km 2nd Milestone'),
     ('8km3', '8 km 3rd Milestone'),
@@ -186,6 +185,9 @@ class SystemMessages(models.Model):
     def save(self, *args, **kwargs):
         handle_system_message_update(self)
         super(SystemMessages, self).save(*args, **kwargs)
+
+    def send_to_single_device(self, token):
+        handle_system_message_update(self, token)
 
 
 class Streaming(models.Model):

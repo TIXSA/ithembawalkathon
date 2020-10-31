@@ -1,3 +1,5 @@
+import json
+
 import bcrypt
 import newrelic.agent
 from django.contrib.auth import get_user_model
@@ -268,3 +270,75 @@ def update_received_messages():
     system_messages_ids = SystemMessages.objects.filter(message_sent=True).values_list('pk', flat=True)
     json_list = list(system_messages_ids)
     Walker.objects.update(messages_received=json_list)
+
+
+def check_milestones(user_profile, walker_input):
+    walker = Walker.objects.filter(user_profile=user_profile).first()
+    milestones = json.loads(walker.milestones)
+    messages_received = json.loads(walker.messages_received)
+
+    if int(walker.distance_to_walk) == 4:
+        if float(walker_input['total_walked_distance']) < 1 and len(milestones) == 0:
+            four_km_1st = SystemMessages.objects.filter(send_condition='4km1').first()
+            if four_km_1st.pk not in messages_received:
+                messages_received.append(four_km_1st.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1], messages_received=messages_received)
+            four_km_1st.send_to_single_device(walker.fcm_token)
+
+        if float(walker_input['total_walked_distance']) >= 2 and len(milestones) == 1:
+            four_km_2nd = SystemMessages.objects.filter(send_condition='4km2').first()
+            if four_km_2nd.pk not in messages_received:
+                messages_received.append(four_km_2nd.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1, 2], messages_received=messages_received)
+            four_km_2nd.send_to_single_device(walker.fcm_token)
+
+        if float(walker_input['total_walked_distance']) >= 4 and len(milestones) == 2:
+            four_km_3rd = SystemMessages.objects.filter(send_condition='4km3').first()
+            if four_km_3rd.pk not in messages_received:
+                messages_received.append(four_km_3rd.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1, 2, 3], messages_received=messages_received)
+            four_km_3rd.send_to_single_device(walker.fcm_token)
+
+    if int(walker.distance_to_walk) == 8:
+        if float(walker_input['total_walked_distance']) < 1 and len(milestones) == 0:
+            eight_km_1st = SystemMessages.objects.filter(send_condition='8km1').first()
+            if eight_km_1st.pk not in messages_received:
+                messages_received.append(eight_km_1st.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1], messages_received=messages_received)
+            eight_km_1st.send_to_single_device(walker.fcm_token)
+
+        if float(walker_input['total_walked_distance']) >= 4 and len(milestones) == 1:
+            eight_km_2nd = SystemMessages.objects.filter(send_condition='8km2').first()
+            if eight_km_2nd.pk not in messages_received:
+                messages_received.append(eight_km_2nd.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1, 2], messages_received=messages_received)
+            eight_km_2nd.send_to_single_device(walker.fcm_token)
+
+        if float(walker_input['total_walked_distance']) >= 6 and len(milestones) == 2:
+            eight_km_3rd = SystemMessages.objects.filter(send_condition='8km3').first()
+            if eight_km_3rd.pk not in messages_received:
+                messages_received.append(eight_km_3rd.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1, 2, 3], messages_received=messages_received)
+            eight_km_3rd.send_to_single_device(walker.fcm_token)
+
+        if float(walker_input['total_walked_distance']) >= 8 and len(milestones) == 3:
+            eight_km_4th = SystemMessages.objects.filter(send_condition='8km4').first()
+            if eight_km_4th.pk not in messages_received:
+                messages_received.append(eight_km_4th.pk)
+
+            Walker.objects.filter(user_profile=user_profile) \
+                .update(milestones=[1, 2, 3, 4], messages_received=messages_received)
+            eight_km_4th.send_to_single_device(walker.fcm_token)
+

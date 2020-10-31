@@ -6,7 +6,7 @@ from .types import WalkerType, StreamingType, UserType
 from ..helpers.common import handle_model_update
 from ..helpers.common import iso_string_to_datetime
 from ..helpers.graphql_helpers import send_password_reset_message, send_contact_us_message, update_uids, \
-    update_received_messages, send_blast_task, login_everyone, login_already_created, create_app_admin
+    update_received_messages, send_blast_task, login_everyone, login_already_created, create_app_admin, check_milestones
 from ..helpers.walker import WalkerHelper
 from ..models import Walker, Streaming
 
@@ -95,7 +95,10 @@ class UpdateWalker(graphene.Mutation):
             walker_input['time_ended'] = iso_string_to_datetime(walker_input.time_ended)
         if walker_input.time_started:
             walker_input['time_started'] = iso_string_to_datetime(walker_input.time_started)
-
+        if walker_input.total_walked_distance:
+            django_rq.enqueue(check_milestones, kwargs={
+                'user_profile': user_profile, 'walker_input': {**walker_input}
+            })
         Walker.objects.filter(user_profile=user_profile).update(**walker_input)
         walker = Walker.objects.filter(user_profile=user_profile).first()
         return UpdateWalker(walker)
